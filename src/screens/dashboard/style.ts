@@ -9,6 +9,11 @@ const styles = StyleSheet.create({
     },
     text:{
         color: 'white'
+    },
+    topBar:{
+        flexDirection: 'row', 
+        padding: 20, 
+        justifyContent: 'space-between'
     }
 });
 

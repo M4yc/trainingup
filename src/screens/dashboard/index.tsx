@@ -23,7 +23,7 @@ const Dashboard = () => {
 
     return (
         <Layout>
-            <View style={{ flexDirection: 'row', padding: 20, justifyContent: 'space-between'}}>
+            <View style={styles.topBar}>
                 <View style={{flexDirection: 'row'}}>
                     <Ionicons name='person-sharp' size={30} color={'white'}/>
                     <View >

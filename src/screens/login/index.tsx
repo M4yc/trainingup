@@ -41,38 +41,42 @@ const LoginScreen = () => {
                     <Image 
                         source={require('../../assets/Icon_app.png')} 
                         style={{width: 150, height: 150}}/>
-                    <View style={{gap: 20, width: '100%'}}>
-                        <Controller
-                            control={control}
-                            name='email'
-                            render={({field: {onChange, value} })=>(
-                                <TextInput
-                                    placeholder="Usuário"
-                                    style={styles.inputUser}
-                                    placeholderTextColor="#aaa"
-                                    value={value}
-                                    onChangeText={onChange}
-                                    keyboardType='email-address'
-                                    autoCapitalize='none'
-                                />
-                            )}
-                        />
-                        {errors.email &&(<Text style={{ color: 'red'}}>{errors.email.message}</Text>)}
-                        <Controller
-                            control={control}
-                            name='password'
-                            render={({field: {onChange, value} })=>(
-                                <TextInput
-                                    placeholder="Senha"
-                                    style={styles.inputUser}
-                                    placeholderTextColor="#aaa"
-                                    value={value}
-                                    onChangeText={onChange}
-                                    secureTextEntry
-                                />
-                            )}
-                        />
-                        {errors.password &&(<Text style={{ color: 'red'}}>{errors.password.message}</Text>)}
+                    <View style={{ width: '100%', gap: 20}}>
+                        <View>
+                            <Controller
+                                control={control}
+                                name='email'
+                                render={({field: {onChange, value} })=>(
+                                    <TextInput
+                                        placeholder="Usuário"
+                                        style={styles.inputUser}
+                                        placeholderTextColor="#aaa"
+                                        value={value}
+                                        onChangeText={onChange}
+                                        keyboardType='email-address'
+                                        autoCapitalize='none'
+                                    />
+                                )}
+                            />
+                            {errors.email &&(<Text style={{ color: 'red', marginTop: 4}}>{errors.email.message}</Text>)}
+                        </View>
+                        <View>
+                            <Controller
+                                control={control}
+                                name='password'
+                                render={({field: {onChange, value} })=>(
+                                    <TextInput
+                                        placeholder="Senha"
+                                        style={styles.inputUser}
+                                        placeholderTextColor="#aaa"
+                                        value={value}
+                                        onChangeText={onChange}
+                                        secureTextEntry
+                                    />
+                                )}
+                            />
+                            {errors.password &&(<Text style={{ color: 'red', marginTop: 4}}>{errors.password.message}</Text>)}
+                        </View>
                     </View>
                     <View style={styles.containerEscSenha}>
                         <Text onPress={()=>null} style={styles.textEscSenha}>Esquecu a senha?</Text>
