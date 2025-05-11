@@ -65,16 +65,6 @@ export default function AppTabNavigator() {
         }}
       />
       <Tab.Screen
-        name="Perfil"
-        component={Perfil}
-        options={{
-          headerShown:false,
-          tabBarIcon: ({ color }) => (
-            <MaterialIcons name="person" size={32} color={color} />
-          ),
-        }}
-      />
-      <Tab.Screen
         name="Estatistica"
         component={Estatistica}
         options={{
@@ -84,7 +74,16 @@ export default function AppTabNavigator() {
           ),
         }}
       />
-      {/* Adicione outras tabs seguindo o mesmo padrão */}
+      <Tab.Screen
+        name="Perfil"
+        component={Perfil}
+        options={{
+          headerShown:false,
+          tabBarIcon: ({ color }) => (
+            <MaterialIcons name="person" size={32} color={color} />
+          ),
+        }}
+      />
     </Tab.Navigator>
   );
 }
