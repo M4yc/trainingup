@@ -1,40 +1,31 @@
 import React from 'react';
-import { View,  Text} from 'react-native';
-
 import styles from './style';
 
-import { useNavigation } from '@react-navigation/native';
-import { RootStackParamList } from '../../routes/types';
-import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { useAuth } from '../../contexts/AuthContext';
 import Layout from '../../components/layout';
-import { Ionicons } from '@expo/vector-icons';
-// Defina o tipo da navegação para a tela Login
-type LoginScreenNavigationProp = NativeStackNavigationProp<RootStackParamList,'Login'>;
+import ListWeek from '../../components/listWeek';
+import TopBarDashboard from '../../components/topBarDashboard';
+import ContainerStats from '../../components/containerStats';
+import { View,  Text, ImageBackground, Touchable, TouchableOpacity} from 'react-native';
 
 const Dashboard = () => {
-    const navigation = useNavigation<LoginScreenNavigationProp>();
-    const { user, signOut } = useAuth();
-
-
-    const handleScreen = () =>{
-        navigation.navigate('Login');
-    }
 
     return (
         <Layout>
-            <View style={styles.topBar}>
-                <View style={{flexDirection: 'row'}}>
-                    <Ionicons name='person-sharp' size={30} color={'white'}/>
-                    <View >
-                        <Text style={{color: 'white'}}>Edinho</Text>
-                        <Text style={{color: 'white'}}>Aluno</Text>
-                    </View>
-                </View>
-                
-                <Ionicons name='menu' size={24} color={'white'}/>
-            </View>
-            <View style={{backgroundColor: '#c4c5c5', flexDirection: 'row', padding: 20, justifyContent: 'space-between'}}>
+            <TopBarDashboard/>
+            <ListWeek/>
+            <ContainerStats/>
+            <View>
+                <Text style={{color: '#fff', fontSize: 24, fontWeight: '500'}}>Treino</Text>
+                <TouchableOpacity>
+                    <ImageBackground 
+                        source={require('../../assets/imgs/bg_musc.png')}
+                        style={{width: '100%', height:200}}
+                        imageStyle={{opacity: 0.4}}
+                    >
+                        <Text style={{color: '#fff', paddingLeft: 10, paddingTop: 10,fontSize: 24}}>Ficha de treino</Text>
+                        <Text style={{color: '#fff', paddingLeft: 10}}>Foco: Hipertrofia</Text>
+                    </ImageBackground>
+                </TouchableOpacity>
                 
             </View>
         </Layout>
