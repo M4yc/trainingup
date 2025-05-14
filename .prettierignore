@@ -1,0 +1,12 @@
+node_modules
+.next
+yarn.lock
+package-lock.json
+public
+.vercel
+.expo
+dist
+android
+ios
+.idea
+/src/animations/**

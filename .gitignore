@@ -17,6 +17,8 @@ expo-env.d.ts
 *.p12
 *.key
 *.mobileprovision
+.env
+package-lock.json
 
 # Metro
 .metro-health-check*
@@ -35,3 +37,6 @@ yarn-error.*
 
 # typescript
 *.tsbuildinfo
+
+ios/
+android/

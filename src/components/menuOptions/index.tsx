@@ -1,33 +1,27 @@
 import React, { JSX } from 'react';
-import { View,  Text, TouchableOpacity, ViewStyle} from 'react-native';
-import styles from './style';
-import Colors from '../../constants/colors';
+import { View, Text, TouchableOpacity, ViewStyle } from 'react-native';
+
 import { Ionicons } from '@expo/vector-icons';
 
-type Props={
-    text: string;
-    icon: JSX.Element;
-    onPress: () => void;
-    style?: ViewStyle;
-}
+import styles from './style';
 
-const MenuOptions: React.FC<Props> = ({
-    text,
-    icon,
-    onPress,
-    style
-    
-    }) => {
-    
-    return (
-        <TouchableOpacity style={[styles.container, style]} onPress={onPress}>
-            <View style={styles.contentLeft}>
-                {icon}
-                <Text style={styles.text}>{text}</Text>
-            </View>
-            <Ionicons name='chevron-forward' color={'#fff'} size={20}/>
-        </TouchableOpacity>
-    );
+type Props = {
+  text: string;
+  icon: JSX.Element;
+  onPress: () => void;
+  style?: ViewStyle;
+};
+
+const MenuOptions: React.FC<Props> = ({ text, icon, onPress, style }) => {
+  return (
+    <TouchableOpacity style={[styles.container, style]} onPress={onPress}>
+      <View style={styles.contentLeft}>
+        {icon}
+        <Text style={styles.text}>{text}</Text>
+      </View>
+      <Ionicons name="chevron-forward" color={'#fff'} size={20} />
+    </TouchableOpacity>
+  );
 };
 
 export default MenuOptions;
