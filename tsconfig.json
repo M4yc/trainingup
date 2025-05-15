@@ -1,6 +1,40 @@
 {
   "extends": "expo/tsconfig.base",
   "compilerOptions": {
-    "strict": true
-  }
+    "strict": true,
+    "noUnusedLocals": true,
+    "noImplicitReturns": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "strictPropertyInitialization": false,
+    "jsx": "react-native",
+    "allowSyntheticDefaultImports": true, // Permite importações de módulos
+    "esModuleInterop": true, // Permite interoperabilidade com módulos ES
+    "resolveJsonModule": true, // Permite importação de módulos JSON
+    "moduleResolution": "node", // Resolve módulos no estilo Node.js
+    "baseUrl": ".", // Define a base do projeto
+    "paths": {
+      "@assets/*": ["./assets/*"],
+      "@srcAssets/*": ["./src/base/assets/*"],
+      "@configs/*": ["./configs/*"],
+      "@components/*": ["./src/base/components/*"],
+      "@constants/*": ["./src/base/constants/*"],
+      "@controllers/*": ["./src/base/controllers/*"],
+      "@database/*": ["./src/base/database/*"],
+      "@hooks/*": ["./src/base/hooks/*"],
+      "@navigation/*": ["./src/base/navigation/*"],
+      "@screens/*": ["./src/base/screens/*"],
+      "@services/*": ["./src/base/services/*"],
+      "@storage/*": ["./src/base/storage/*"],
+      "@srcTypes/*": ["./src/base/types/*"],
+      "@utils/*": ["./src/base/utils/*"],
+      "@validations/*": ["./src/base/validations/*"],
+    }
+  },
+  "exclude": [
+    "node_modules",
+    "babel.config.js",
+    "metro.config.js",
+    "jest.config.js"
+  ]
 }
