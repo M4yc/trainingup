@@ -1,12 +1,11 @@
+import Colors from '@constants/colors';
 import { MaterialIcons } from '@expo/vector-icons';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import Dashboard from '@screens/dashboard';
+import Estatistica from '@screens/estatistica';
+import FichaTreino from '@screens/fichaTreino';
+import Perfil from '@screens/profile';
 
-import Colors from '../../constants/colors';
-import Dashboard from '../../screens/dashboard';
-import Estatistica from '../../screens/estatistica';
-import FichaTreino from '../../screens/fichaTreino';
-import Perfil from '../../screens/profile';
-import styles from './style';
 import { AppTabParamList } from './types';
 
 const Tab = createBottomTabNavigator<AppTabParamList>();
@@ -45,8 +44,8 @@ export default function AppTabNavigator() {
         component={Dashboard}
         options={{
           headerShown: false,
-          tabBarIcon: ({ color }) => (
-            <MaterialIcons name="home" size={32} color={color} />
+          tabBarIcon: ({ color, size }) => (
+            <MaterialIcons name="home" size={size} color={color} />
           )
         }}
       />

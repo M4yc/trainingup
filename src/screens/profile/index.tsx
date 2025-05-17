@@ -6,7 +6,7 @@ import { Ionicons } from '@expo/vector-icons';
 
 import Layout from '../../components/layout';
 import MenuOptions from '../../components/menuOptions';
-import { useAuth } from '../../contexts/AuthContext';
+import { useAuth } from '../../contexts/Auth';
 import styles from './style';
 
 const Perfil = () => {

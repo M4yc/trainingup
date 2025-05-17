@@ -7,7 +7,7 @@ import {
   View,
   StyleSheet,
   StatusBar,
-  ScrollView,
+  ScrollView
 } from 'react-native';
 
 type Props = {
@@ -24,10 +24,11 @@ const Layout: React.FC<Props> = ({ children, style }) => {
     >
       <StatusBar barStyle="light-content" />
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-        <ScrollView 
+        <ScrollView
           contentContainerStyle={[styles.inner, style]}
-          keyboardShouldPersistTaps='handled'
-          showsVerticalScrollIndicator={false}>
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
+        >
           {children}
         </ScrollView>
       </TouchableWithoutFeedback>
@@ -39,10 +40,10 @@ export default Layout;
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: 'black',
-    flex: 1,
+    backgroundColor: '#171717',
+    flex: 1
   },
   inner: {
-    flex: 1,
-  },
+    flex: 1
+  }
 });

@@ -10,8 +10,8 @@ import Layout from '@components/layout';
 import Colors from '@constants/colors';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { loginSchema } from '@validations/schemas';
+import { useAuth } from 'src/contexts/Auth';
 
-import { useAuth } from '../../contexts/AuthContext';
 import styles from './style';
 
 type FormData = {

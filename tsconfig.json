@@ -11,7 +11,7 @@
     "allowSyntheticDefaultImports": true, // Permite importações de módulos
     "esModuleInterop": true, // Permite interoperabilidade com módulos ES
     "resolveJsonModule": true, // Permite importação de módulos JSON
-    "moduleResolution": "node", // Resolve módulos no estilo Node.js
+    "moduleResolution": "bundler", // Resolve módulos no estilo Node.js
     "baseUrl": ".", // Define a base do projeto
     "paths": {
       "@assets/*": ["./src/assets/*"],
