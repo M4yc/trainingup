@@ -45,7 +45,7 @@ export default function AppTabNavigator() {
         options={{
           headerShown: false,
           tabBarIcon: ({ color, size }) => (
-            <MaterialIcons name="home" size={size} color={color} />
+            <MaterialIcons name="home" size={32} color={color} />
           )
         }}
       />

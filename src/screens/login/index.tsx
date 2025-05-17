@@ -108,11 +108,6 @@ const LoginScreen = () => {
               Criar uma conta
             </Text>
           </View>
-          <DividerLogin style={{ marginVertical: 40 }} />
-          <View style={{ gap: 15 }}>
-            <ButtonLogin variant="Google" onPress={() => null} />
-            <ButtonLogin variant="Apple" onPress={() => null} />
-          </View>
         </View>
       </View>
     </Layout>

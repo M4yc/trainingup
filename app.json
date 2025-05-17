@@ -13,9 +13,11 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
+      "bundleIdentifier": "com.trainingup.ios",
       "supportsTablet": true
     },
     "android": {
+      "package": "com.trainingup.android",
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
@@ -24,6 +26,19 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      [
+        "@react-native-google-signin/google-signin",
+        {
+          "iosUrlScheme": "com.googleusercontent.apps.84571658648-098rdsh2o5rd293a26hamhhf20n4absq"
+        }
+      ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "1ff3c4ce-7ac1-4199-bbba-e8f86e26f5a4"
+      }
     }
   }
 }
