@@ -1,11 +1,9 @@
 /* eslint-disable @typescript-eslint/no-require-imports */
-import React, { useState } from 'react';
+import React from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { View, Text, TextInput, Image } from 'react-native';
 
 import Button from '@components//button';
-import ButtonLogin from '@components//buttonLogin';
-import DividerLogin from '@components/dividerLogin';
 import Layout from '@components/layout';
 import Colors from '@constants/colors';
 import { yupResolver } from '@hookform/resolvers/yup';
