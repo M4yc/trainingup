@@ -33,7 +33,7 @@ git --version
 git clone https://github.com/M4yc/trainingup.git
 
 # Navegar até o diretório do exercício
-cd training
+cd trainingup
 
 #Instale as dependências
 npm install
