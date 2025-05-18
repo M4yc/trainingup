@@ -11,6 +11,7 @@ import styles from './style';
 
 const Perfil = () => {
   const { signOut } = useAuth();
+  const { authData } = useAuth();
 
   const botoes = [
     {
@@ -42,7 +43,7 @@ const Perfil = () => {
           source={require('../../assets/imgs/userProfile.jpg')}
           style={{ width: 64, height: 64, borderRadius: 999 }}
         />
-        <Text style={{ color: 'white' }}>User Name</Text>
+        <Text style={{ color: 'white' }}>{authData?.name}</Text>
         <Text style={styles.text}>Perfil</Text>
         <View style={styles.buttons}>
           {botoes.map((item) => (
