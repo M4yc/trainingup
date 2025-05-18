@@ -1,10 +1,10 @@
 import Colors from '@constants/colors';
 import { MaterialIcons } from '@expo/vector-icons';
+import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import Dashboard from '@screens/dashboard';
+import AlunosScreen from '@screens/alunos';
 import DashboardPersonal from '@screens/dashboardPersonal';
 import Estatistica from '@screens/estatistica';
-import FichaTreino from '@screens/fichaTreino';
 import Perfil from '@screens/profile';
 
 import { AppTabParamList } from './types';
@@ -51,12 +51,12 @@ export default function AppTabNavigatorPersonal() {
         }}
       />
       <Tab.Screen
-        name="FichaTreino"
-        component={FichaTreino}
+        name="Alunos"
+        component={AlunosScreen}
         options={{
           headerShown: false,
           tabBarIcon: ({ color }) => (
-            <MaterialIcons name="content-paste" size={32} color={color} />
+            <FontAwesome name="users" size={28} color={color} />
           )
         }}
       />

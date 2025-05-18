@@ -12,7 +12,7 @@ import styles from './style';
 
 type NavigationProp = NativeStackNavigationProp<AppStackParamList>;
 
-const FichaTreino = () => {
+const TreinosScreen = () => {
   const navigation = useNavigation<NavigationProp>();
 
   return (
@@ -35,4 +35,4 @@ const FichaTreino = () => {
   );
 };
 
-export default FichaTreino;
+export default TreinosScreen;
