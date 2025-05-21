@@ -59,19 +59,21 @@ const Perfil = () => {
             <Text style={styles.userName}>{authData?.name}</Text>
             <Text style={styles.userEmail}>{authData?.email}</Text>
             <View style={styles.statusBadge}>
-              <Text style={styles.statusText}>Personal Trainer</Text>
+              <Text style={styles.statusText}>{authData?.userType}</Text>
             </View>
           </View>
 
           <View style={styles.content}>
-            <View style={styles.statsContainer}>
-              {stats.map((stat, index) => (
-                <View key={index} style={styles.statItem}>
-                  <Text style={styles.statValue}>{stat.value}</Text>
-                  <Text style={styles.statLabel}>{stat.label}</Text>
-                </View>
-              ))}
-            </View>
+            {authData?.userType === 'personal' && (
+              <View style={styles.statsContainer}>
+                {stats.map((stat, index) => (
+                  <View key={index} style={styles.statItem}>
+                    <Text style={styles.statValue}>{stat.value}</Text>
+                    <Text style={styles.statLabel}>{stat.label}</Text>
+                  </View>
+                ))}
+              </View>
+            )}
 
             <Text style={styles.sectionTitle}>Menu</Text>
             <View style={styles.menuSection}>

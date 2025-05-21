@@ -12,21 +12,24 @@ export const loginSchema = yup.object().shape({
     .required('Senha é obrigatória')
 });
 
-// Esquema de validação para Cadastro
+// Esquema de validação para Registro
 export const registerSchema = yup.object().shape({
   name: yup
     .string()
-    .required('Nome é obrigatório')
-    .min(3, 'Mínimo 3 caracteres'),
-  email: yup.string().email('E-mail inválido').required('E-mail é obrigatório'),
+    .min(3, 'O nome deve ter no mínimo 3 caracteres')
+    .required('Nome é obrigatório'),
+  email: yup
+    .string()
+    .email('Digite um e-mail válido')
+    .required('E-mail é obrigatório'),
   password: yup
     .string()
-    .min(6, 'Mínimo 6 caracteres')
+    .min(6, 'A senha deve ter no mínimo 6 caracteres')
     .required('Senha é obrigatória'),
   confirmPassword: yup
     .string()
-    .oneOf([yup.ref('password')], 'As senhas não coincidem')
-    .required('Confirme sua senha')
+    .oneOf([yup.ref('password')], 'As senhas não conferem')
+    .required('Confirmação de senha é obrigatória')
 });
 
 // Esquema de validação para Ficha de Treino
