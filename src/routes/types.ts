@@ -18,4 +18,6 @@ export type AppStackParamList = {
   Exercicio: undefined;
   Corpo: undefined;
   FichaTreinoAluno: undefined;
+  CreateWorkoutPlan: undefined;
+  NovaFichaTreino: undefined;
 };

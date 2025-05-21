@@ -2,43 +2,34 @@ import { StyleSheet } from 'react-native';
 
 const styles = StyleSheet.create({
   header: {
+    flexDirection: 'row',
+    alignItems: 'center',
     backgroundColor: '#211d28',
     padding: 20,
     marginBottom: 16
   },
   title: {
-    fontSize: 24,
+    fontSize: 20,
     fontWeight: 'bold',
     color: '#fff',
-    marginBottom: 8
-  },
-  subtitle: {
-    fontSize: 16,
-    color: '#666'
+    marginLeft: 16
   },
   content: {
     flex: 1,
     backgroundColor: '#211d28',
     padding: 20
   },
-  fab: {
-    position: 'absolute',
-    right: 20,
-    bottom: 20,
-    width: 56,
-    height: 56,
-    borderRadius: 28,
+  button: {
     backgroundColor: '#44BF86',
-    justifyContent: 'center',
+    padding: 16,
+    borderRadius: 8,
     alignItems: 'center',
-    elevation: 4,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84
+    marginTop: 24
+  },
+  buttonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold'
   }
 });
 

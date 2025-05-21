@@ -10,24 +10,8 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Feather } from '@expo/vector-icons';
-import { useNavigation } from '@react-navigation/native';
-import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
 import { styles } from './styles';
-
-type RootStackParamList = {
-  ListaAlunos: undefined;
-  NovoAluno: undefined;
-  CreateWorkoutPlan: {
-    alunoId: string;
-    alunoNome: string;
-  };
-};
-
-type NavigationProp = NativeStackNavigationProp<
-  RootStackParamList,
-  'ListaAlunos'
->;
 
 interface Aluno {
   id: string;
@@ -84,12 +68,11 @@ const alunosExemplo: Aluno[] = [
 const filtrosStatus = ['Todos', 'Ativo', 'Inativo', 'Pendente'];
 const filtrosPlano = ['Todos', 'Básico', 'Premium'];
 
-export default function AlunosScreen() {
-  const navigation = useNavigation<NavigationProp>();
+export default function ListaAlunos() {
   const [busca, setBusca] = useState('');
   const [statusSelecionado, setStatusSelecionado] = useState('Todos');
   const [planoSelecionado, setPlanoSelecionado] = useState('Todos');
-  const [ordenacao, setOrdenacao] = useState('nome');
+  const [ordenacao, setOrdenacao] = useState<'nome' | 'proximoTreino'>('nome');
 
   const filtrarAlunos = () => {
     let alunosFiltrados = [...alunosExemplo];
@@ -201,21 +184,15 @@ export default function AlunosScreen() {
       <View style={styles.acoesContainer}>
         <TouchableOpacity
           style={[styles.acaoButton, { backgroundColor: '#44BF86' }]}
-          onPress={() =>
-            navigation.navigate('CreateWorkoutPlan', {
-              alunoId: item.id,
-              alunoNome: item.nome
-            })
-          }
         >
-          <Feather name="file-plus" size={20} color="#fff" />
-          <Text style={styles.acaoButtonText}>Nova Ficha</Text>
+          <Feather name="edit-3" size={20} color="#FFFFFF" />
+          <Text style={styles.acaoText}>Editar</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={[styles.acaoButton, { backgroundColor: '#00908E' }]}
         >
-          <Feather name="edit-3" size={20} color="#fff" />
-          <Text style={styles.acaoButtonText}>Editar</Text>
+          <Feather name="file-text" size={20} color="#FFFFFF" />
+          <Text style={styles.acaoText}>Ficha</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={[styles.acaoButton, { backgroundColor: '#FF6B6B' }]}
@@ -232,10 +209,7 @@ export default function AlunosScreen() {
       <SafeAreaView edges={['top']} style={{ flex: 1 }}>
         <View style={styles.header}>
           <Text style={styles.title}>Meus Alunos</Text>
-          <TouchableOpacity
-            style={styles.addButton}
-            onPress={() => navigation.navigate('NovoAluno')}
-          >
+          <TouchableOpacity style={styles.addButton}>
             <Feather name="user-plus" size={24} color="#FFFFFF" />
           </TouchableOpacity>
         </View>

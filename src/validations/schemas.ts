@@ -9,7 +9,7 @@ export const loginSchema = yup.object().shape({
   password: yup
     .string()
     .min(6, 'A senha deve ter no mínimo 6 caracteres')
-    .required('Senha é obrigatória'),
+    .required('Senha é obrigatória')
 });
 
 // Esquema de validação para Cadastro
@@ -18,10 +18,7 @@ export const registerSchema = yup.object().shape({
     .string()
     .required('Nome é obrigatório')
     .min(3, 'Mínimo 3 caracteres'),
-  email: yup
-    .string()
-    .email('E-mail inválido')
-    .required('E-mail é obrigatório'),
+  email: yup.string().email('E-mail inválido').required('E-mail é obrigatório'),
   password: yup
     .string()
     .min(6, 'Mínimo 6 caracteres')
@@ -29,5 +26,22 @@ export const registerSchema = yup.object().shape({
   confirmPassword: yup
     .string()
     .oneOf([yup.ref('password')], 'As senhas não coincidem')
-    .required('Confirme sua senha'),
+    .required('Confirme sua senha')
+});
+
+// Esquema de validação para Ficha de Treino
+export const fichaTreinoSchema = yup.object().shape({
+  nomeAluno: yup.string().required('Nome do aluno é obrigatório'),
+  objetivo: yup.string().required('Objetivo é obrigatório'),
+  dataInicial: yup.string().required('Data inicial é obrigatória'),
+  dataFinal: yup.string().required('Data final é obrigatória'),
+  exercicios: yup.array().of(
+    yup.object().shape({
+      nome: yup.string().required('Nome do exercício é obrigatório'),
+      series: yup.string().required('Número de séries é obrigatório'),
+      repeticoes: yup.string().required('Número de repetições é obrigatório'),
+      peso: yup.string().required('Peso é obrigatório'),
+      descanso: yup.string().required('Tempo de descanso é obrigatório')
+    })
+  )
 });

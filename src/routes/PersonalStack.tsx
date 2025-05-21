@@ -1,6 +1,7 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import DashboardPersonal from '@screens/dashboardPersonal';
-import FichaTreinoAluno from '@screens/fichaAluno';
+import { CreateWorkoutPlan } from '@screens/fichaAluno/createWorkoutPlan';
+import NovaFichaTreino from '@screens/novaFichaTreino';
 import TreinoDesc from '@screens/treinoDesc';
 
 import AppTabNavigatorPersonal from './tabRoutesPersonal';
@@ -17,7 +18,8 @@ export default function PersonalStack() {
     >
       <Stack.Screen name="App" component={AppTabNavigatorPersonal} />
       <Stack.Screen name="DashboardPersonal" component={DashboardPersonal} />
-      <Stack.Screen name="FichaTreinoAluno" component={FichaTreinoAluno} />
+      <Stack.Screen name="CreateWorkoutPlan" component={CreateWorkoutPlan} />
+      <Stack.Screen name="NovaFichaTreino" component={NovaFichaTreino} />
     </Stack.Navigator>
   );
 }
