@@ -48,7 +48,7 @@ const RegisterScreen = () => {
   const onSubmit = async (data: FormData) => {
     try {
       setIsLoading(true);
-      await registrarUsuario(data.email, data.password, data.name, userType);
+      //await registrarUsuario(data.email, data.password, data.name, userType);
       Alert.alert('Sucesso', 'Cadastro realizado com sucesso!');
     } catch (error: any) {
       Alert.alert('Erro', error.message || 'Erro ao realizar cadastro');
