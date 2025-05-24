@@ -1,7 +1,7 @@
 const Colors = {
     primary: '#44BF86',
     auxiliar: '#00908E',
-    auxiliar2: '#2F4858',
+    auxiliar2: '#2A2634',
     white: '#fff',
     neutro: '#efefff',
     fundo: '#211d28',

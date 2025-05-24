@@ -14,12 +14,13 @@ export default function PersonalStack() {
   return (
     <Stack.Navigator
       screenOptions={{ headerShown: false }}
-      initialRouteName="App"
+      initialRouteName="MainTabs"
     >
-      <Stack.Screen name="App" component={AppTabNavigatorPersonal} />
+      <Stack.Screen name="MainTabs" component={AppTabNavigatorPersonal} />
       <Stack.Screen name="DashboardPersonal" component={DashboardPersonal} />
       <Stack.Screen name="CreateWorkoutPlan" component={CreateWorkoutPlan} />
       <Stack.Screen name="NovaFichaTreino" component={NovaFichaTreino} />
+      <Stack.Screen name="TreinoDesc" component={TreinoDesc} />
     </Stack.Navigator>
   );
 }

@@ -53,7 +53,7 @@ export default function AppTabNavigator() {
         }}
       />
       <Tab.Screen
-        name="FichaTreino"
+        name="TreinosScreen"
         component={FichaTreino}
         options={{
           headerShown: false,

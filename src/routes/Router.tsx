@@ -15,23 +15,32 @@ const Stack = createNativeStackNavigator<RootStackParamList>();
 export function Router() {
   const [user, setUser] = useState<User | null>(null);
   const [userType, setUserType] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged(async (_user) => {
       setUser(_user);
       if (_user) {
-        // Buscar o tipo do usuário
-        const docRef = doc(db, "usuarios", _user.uid);
-        const docSnap = await getDoc(docRef);
-        if (docSnap.exists()) {
-          setUserType(docSnap.data().tipo);
+        try {
+          const docRef = doc(db, "usuarios", _user.uid);
+          const docSnap = await getDoc(docRef);
+          if (docSnap.exists()) {
+            setUserType(docSnap.data().tipo);
+          }
+        } catch (error) {
+          console.error("Erro ao buscar tipo de usuário:", error);
         }
       } else {
         setUserType(null);
       }
+      setLoading(false);
     });
     return () => unsubscribe();
   }, []);
+
+  if (loading) {
+    return null; // ou um componente de loading
+  }
 
   return (
     <NavigationContainer>
@@ -41,14 +50,10 @@ export function Router() {
             <Stack.Screen name="Login" component={LoginScreen} />
             <Stack.Screen name="Register" component={RegisterScreen} />
           </>
+        ) : userType === 'Personal' ? (
+          <Stack.Screen name="PersonalStack" component={PersonalStack} />
         ) : (
-          <>
-            {userType === 'Personal' ? (
-              <Stack.Screen name="PersonalStack" component={PersonalStack} />
-            ) : (
-              <Stack.Screen name="AlunoStack" component={AppStack} />
-            )}
-          </>
+          <Stack.Screen name="AlunoStack" component={AppStack} />
         )}
       </Stack.Navigator>
     </NavigationContainer>

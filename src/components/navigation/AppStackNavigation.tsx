@@ -3,7 +3,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 import { AppStackParamList } from '../../routes/types';
 import TreinoDesc from '../../screens/treinoDesc';
-import AppTabNavigator from './AppTabNavigator';
+import AppTabNavigator from '../../routes/tabRoutes';
 // import Configuracoes from '../../screens/configuracoes';
 // import Exercicio from '../../screens/exercicio';
 // import Corpo from '../../screens/corpo';

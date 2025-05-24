@@ -13,6 +13,7 @@ import { Feather } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
+import Colors from '@constants/colors';
 import { styles } from './styles';
 
 type RootStackParamList = {
@@ -37,13 +38,7 @@ interface Aluno {
   status: 'Ativo' | 'Inativo' | 'Pendente';
   ultimoTreino: string;
   proximoTreino: string;
-  plano: string;
-  avaliacao: {
-    data: string;
-    peso: number;
-    altura: number;
-    imc: number;
-  };
+  frequencia: string;
 }
 
 const alunosExemplo: Aluno[] = [
@@ -55,13 +50,8 @@ const alunosExemplo: Aluno[] = [
     status: 'Ativo',
     ultimoTreino: '13/03/2024',
     proximoTreino: '15/03/2024',
-    plano: 'Premium',
-    avaliacao: {
-      data: '01/03/2024',
-      peso: 75.5,
-      altura: 1.75,
-      imc: 24.65
-    }
+    frequencia: '3x',
+    
   },
   {
     id: '2',
@@ -71,24 +61,19 @@ const alunosExemplo: Aluno[] = [
     status: 'Ativo',
     ultimoTreino: '12/03/2024',
     proximoTreino: '14/03/2024',
-    plano: 'Básico',
-    avaliacao: {
-      data: '28/02/2024',
-      peso: 68.0,
-      altura: 1.65,
-      imc: 24.98
-    }
+    frequencia: '5x',
+  
   }
 ];
 
 const filtrosStatus = ['Todos', 'Ativo', 'Inativo', 'Pendente'];
-const filtrosPlano = ['Todos', 'Básico', 'Premium'];
+const filtrosFrequencia = ['Todos', '3x', '5x', '6x'];
 
 export default function AlunosScreen() {
   const navigation = useNavigation<NavigationProp>();
   const [busca, setBusca] = useState('');
   const [statusSelecionado, setStatusSelecionado] = useState('Todos');
-  const [planoSelecionado, setPlanoSelecionado] = useState('Todos');
+  const [frequenciaSelecionada, setFrequenciaSelecionada] = useState('Todos');
   const [ordenacao, setOrdenacao] = useState('nome');
 
   const filtrarAlunos = () => {
@@ -108,10 +93,10 @@ export default function AlunosScreen() {
       );
     }
 
-    // Filtro por plano
-    if (planoSelecionado !== 'Todos') {
+    // Filtro por frequência
+    if (frequenciaSelecionada !== 'Todos') {
       alunosFiltrados = alunosFiltrados.filter(
-        (aluno) => aluno.plano === planoSelecionado
+        (aluno) => aluno.frequencia.includes(frequenciaSelecionada)
       );
     }
 
@@ -160,30 +145,8 @@ export default function AlunosScreen() {
           <Text style={styles.infoText}>Objetivo: {item.objetivo}</Text>
         </View>
         <View style={styles.infoItem}>
-          <Feather name="award" size={16} color="#44BF86" />
-          <Text style={styles.infoText}>Plano: {item.plano}</Text>
-        </View>
-      </View>
-
-      <View style={styles.avaliacaoContainer}>
-        <Text style={styles.avaliacaoTitle}>
-          Última Avaliação: {item.avaliacao.data}
-        </Text>
-        <View style={styles.avaliacaoGrid}>
-          <View style={styles.avaliacaoItem}>
-            <Text style={styles.avaliacaoLabel}>Peso</Text>
-            <Text style={styles.avaliacaoValor}>{item.avaliacao.peso} kg</Text>
-          </View>
-          <View style={styles.avaliacaoItem}>
-            <Text style={styles.avaliacaoLabel}>Altura</Text>
-            <Text style={styles.avaliacaoValor}>{item.avaliacao.altura} m</Text>
-          </View>
-          <View style={styles.avaliacaoItem}>
-            <Text style={styles.avaliacaoLabel}>IMC</Text>
-            <Text style={styles.avaliacaoValor}>
-              {item.avaliacao.imc.toFixed(1)}
-            </Text>
-          </View>
+          <Feather name="calendar" size={16} color="#44BF86" />
+          <Text style={styles.infoText}>Frequência: {item.frequencia}</Text>
         </View>
       </View>
 
@@ -232,12 +195,14 @@ export default function AlunosScreen() {
       <SafeAreaView edges={['top']} style={{ flex: 1 }}>
         <View style={styles.header}>
           <Text style={styles.title}>Meus Alunos</Text>
-          <TouchableOpacity
-            style={styles.addButton}
-            onPress={() => navigation.navigate('NovoAluno')}
-          >
-            <Feather name="user-plus" size={24} color="#FFFFFF" />
-          </TouchableOpacity>
+          <View style={styles.headerButtons}>
+            <TouchableOpacity
+              style={[styles.headerButton, { marginRight: 8 }]}
+              onPress={() => navigation.navigate('NovoAluno')}
+            >
+              <Feather name="user-plus" size={24} color="#FFFFFF" />
+            </TouchableOpacity>
+          </View>
         </View>
 
         <View style={styles.searchContainer}>
@@ -283,23 +248,24 @@ export default function AlunosScreen() {
           </View>
 
           <View style={styles.filtroGrupo}>
-            <Text style={styles.filtroLabel}>Plano:</Text>
-            {filtrosPlano.map((plano) => (
+            <Text style={styles.filtroLabel}>Frequência:</Text>
+            {filtrosFrequencia.map((freq) => (
               <TouchableOpacity
-                key={plano}
+                key={freq}
                 style={[
                   styles.filtroButton,
-                  planoSelecionado === plano && styles.filtroButtonAtivo
+                  frequenciaSelecionada === freq && styles.filtroButtonAtivo
                 ]}
-                onPress={() => setPlanoSelecionado(plano)}
+                onPress={() => setFrequenciaSelecionada(freq)}
               >
                 <Text
                   style={[
                     styles.filtroButtonText,
-                    planoSelecionado === plano && styles.filtroButtonTextoAtivo
+                    frequenciaSelecionada === freq &&
+                      styles.filtroButtonTextoAtivo
                   ]}
                 >
-                  {plano}
+                  {freq}
                 </Text>
               </TouchableOpacity>
             ))}
@@ -349,7 +315,18 @@ export default function AlunosScreen() {
           keyExtractor={(item) => item.id}
           contentContainerStyle={styles.listaContainer}
           showsVerticalScrollIndicator={false}
+          style={{ flex: 1 }}
         />
+
+        <TouchableOpacity 
+          style={styles.fabButton}
+          onPress={() => navigation.navigate('CreateWorkoutPlan', {
+            alunoId: '',
+            alunoNome: ''
+          })}
+        >
+          <Feather name="file-plus" size={24} color="#FFFFFF" />
+        </TouchableOpacity>
       </SafeAreaView>
     </View>
   );

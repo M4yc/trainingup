@@ -38,13 +38,20 @@ export const fichaTreinoSchema = yup.object().shape({
   objetivo: yup.string().required('Objetivo é obrigatório'),
   dataInicial: yup.string().required('Data inicial é obrigatória'),
   dataFinal: yup.string().required('Data final é obrigatória'),
-  exercicios: yup.array().of(
+  grupos: yup.array().of(
     yup.object().shape({
-      nome: yup.string().required('Nome do exercício é obrigatório'),
-      series: yup.string().required('Número de séries é obrigatório'),
-      repeticoes: yup.string().required('Número de repetições é obrigatório'),
-      peso: yup.string().required('Peso é obrigatório'),
-      descanso: yup.string().required('Tempo de descanso é obrigatório')
+      letra: yup.string().required('Letra do grupo é obrigatória'),
+      nome: yup.string().required('Nome do grupo é obrigatório'),
+      foco: yup.string().required('Foco do grupo é obrigatório'),
+      exercicios: yup.array().of(
+        yup.object().shape({
+          nome: yup.string().required('Nome do exercício é obrigatório'),
+          series: yup.string().required('Número de séries é obrigatório'),
+          repeticoes: yup.string().required('Número de repetições é obrigatório'),
+          peso: yup.string().required('Peso é obrigatório'),
+          descanso: yup.string().required('Tempo de descanso é obrigatório')
+        })
+      )
     })
   )
 });
