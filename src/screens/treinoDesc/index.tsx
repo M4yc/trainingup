@@ -4,27 +4,30 @@ import { Text, View, Image, StyleSheet, TouchableOpacity } from 'react-native';
 export default function DetalhesExercício({ navigation }) {
   return (
     <View style={styles.container}>
-      {/* Topo */}
-      <View style>
-        <Text>TOPBARRA</Text>
-        <TouchableOpacity>
-          <Text styles={styles.menu}>=</Text>
-        </TouchableOpacity>
-      </View>
-      <View style={styles.card}>
-        <Text style={styles.cardText}>Detalhes do exercício</Text>
-      </View>
+      <Text style={styles.header}>Detalhes do exercício</Text>
+
+      <View style={styles.linha} />
+
       <View style={styles.card}>
         <Text style={styles.cardText}>Supino em aparelho</Text>
         <Text style={styles.cardText}>Músculo alvo: Peitoral</Text>
+        <Text style={styles.cardText}>
+          Séries: 4 / Repetições: 8 / Peso: 15kg / Intervalo: 30-60s
+        </Text>
       </View>
+
+      <View style={styles.linha} />
+
       <View style={styles.exercicioBox}>
         <Text style={styles.exercicioNome}>Exercício 1</Text>
         <Text style={styles.descricaoTitulo}>Descrição:</Text>
         <View style={styles.descricaoLista}>
-          <Text style={styles.descricaoItem}>3 séries de 12 repetições</Text>
-          <Text style={styles.descricaoItem}>Cuidado com a postura</Text>
-          <Text style={styles.descricaoItem}>Desça até 90 graus</Text>
+          <Text style={styles.descricaoItem}>
+            Este exercício é para ser feito de forma consicente na questão do
+            peso. Não arrisque peso alto sem uma pessoa treinando contigo.
+            Quando sentir que esse peso já está leve, pode ir aumentando aos
+            poucos, COM SEGURANÇA!
+          </Text>
         </View>
         <Image
           source={{
@@ -49,43 +52,58 @@ const styles = StyleSheet.create({
     backgroundColor: '#1a1a1a',
     padding: 10
   },
-  menu: {
-    fontSize: 24,
-    color: '#fff'
+  linha: {
+    width: '100%',
+    height: 2,
+    backgroundColor: '#00908E',
+    alignSelf: 'center'
+  },
+  header: {
+    fontSize: 20,
+    color: '#fff',
+    textAlign: 'center',
+    marginTop: 8,
+    marginBottom: 8
   },
   card: {
-    backgroundColor: '#2e2e2e',
+    backgroundColor: '#1a1a1a',
     padding: 10,
     borderRadius: 10,
     marginVertical: 5
   },
   cardText: {
     color: '#fff',
-    fontSize: 16
+    fontSize: 16,
+    textAlign: 'center'
   },
   exercicioBox: {
-    backgroundColor: '#f0f0f0',
+    backgroundColor: '#1a1a1a',
     borderRadius: 10
   },
   exercicioNome: {
+    marginTop: 5,
+    color: '#fff',
     fontSize: 22,
     fontWeight: 'bold',
     textAlign: 'center',
     marginBottom: 10
   },
   descricaoTitulo: {
-    fontSize: 16,
-    marginBottom: 5
+    color: '#fff',
+    fontSize: 20,
+    marginBottom: 10,
+    marginLeft: 5
   },
   descricaoLista: {
     marginLeft: 10,
     marginBottom: 3
   },
   descricaoItem: {
-    fontSize: 14
+    color: '#fff',
+    fontSize: 16
   },
   imagemExercicio: {
-    marginTop: 200,
+    marginTop: 150,
     width: '100%',
     height: 250,
     resizeMode: 'cover',
@@ -95,6 +113,7 @@ const styles = StyleSheet.create({
     marginRight: 20
   },
   botaoVoltar: {
+    marginTop: 10,
     backgroundColor: '#cccccc',
     padding: 12,
     borderRadius: 10,
