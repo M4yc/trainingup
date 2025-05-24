@@ -19,7 +19,6 @@ import { registerSchema } from '@validations/schemas';
 import { useAuth } from 'src/contexts/Auth';
 import { RootStackParamList } from 'src/routes/types';
 
-import { registrarUsuario } from '../../service/authService2';
 import styles from './style';
 
 type FormData = {
