@@ -1,7 +1,19 @@
 import React from 'react';
 import { Text, View, Image, StyleSheet, TouchableOpacity } from 'react-native';
 
-export default function DetalhesExercício({ navigation }) {
+export default function DetalhesExercício({ navigation, route }) {
+  const {
+    nome,
+    musculoAlvo,
+    series,
+    repeticoes,
+    peso,
+    intervalo,
+    descricao,
+    imagem,
+    numero
+  } = route.params;
+
   return (
     <View style={styles.container}>
       <Text style={styles.header}>Detalhes do exercício</Text>
@@ -9,32 +21,23 @@ export default function DetalhesExercício({ navigation }) {
       <View style={styles.linha} />
 
       <View style={styles.card}>
-        <Text style={styles.cardText}>Supino em aparelho</Text>
-        <Text style={styles.cardText}>Músculo alvo: Peitoral</Text>
+        <Text style={styles.cardText}>{nome}</Text>
+        <Text style={styles.cardText}>Músculo alvo: {musculoAlvo}</Text>
         <Text style={styles.cardText}>
-          Séries: 4 / Repetições: 8 / Peso: 15kg / Intervalo: 30-60s
+          Séries: {series} / Repetições: {repeticoes} / Peso: {peso} /
+          Intervalo: {intervalo}
         </Text>
       </View>
 
       <View style={styles.linha} />
 
       <View style={styles.exercicioBox}>
-        <Text style={styles.exercicioNome}>Exercício 1</Text>
+        <Text style={styles.exercicioNome}>Exercício {numero}</Text>
         <Text style={styles.descricaoTitulo}>Descrição:</Text>
         <View style={styles.descricaoLista}>
-          <Text style={styles.descricaoItem}>
-            Este exercício é para ser feito de forma consicente na questão do
-            peso. Não arrisque peso alto sem uma pessoa treinando contigo.
-            Quando sentir que esse peso já está leve, pode ir aumentando aos
-            poucos, COM SEGURANÇA!
-          </Text>
+          <Text style={styles.descricaoItem}>{descricao}</Text>
         </View>
-        <Image
-          source={{
-            uri: 'https://dicasef.com.br/wp-content/uploads/2024/08/supino-reto-1.jpg'
-          }}
-          style={styles.imagemExercicio}
-        />
+        <Image source={{ uri: imagem }} style={styles.imagemExercicio} />
       </View>
       <TouchableOpacity
         style={styles.botaoVoltar}

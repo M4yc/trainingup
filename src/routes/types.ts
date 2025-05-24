@@ -12,7 +12,17 @@ export type AppTabParamList = {
 
 export type AppStackParamList = {
   MainTabs: undefined;
-  TreinoDesc: undefined;
+  TreinoDesc: {
+    nome: string;
+    musculoAlvo: string;
+    series: number;
+    repeticoes: number;
+    peso: string;
+    intervalo: string;
+    descricao: string;
+    imagem: string;
+    numero: number;
+  };
   Configuracoes: undefined;
   Exercicio: undefined;
   Corpo: undefined;

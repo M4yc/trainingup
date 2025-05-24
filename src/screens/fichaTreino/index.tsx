@@ -22,13 +22,27 @@ const FichaTreino = () => {
       </View>
       <View style={styles.content}>
         <ButtonExe
-          nameExe="Costas"
+          nameExe="Supino em aparelho"
           icon={
             <MaterialIcons name="sports-handball" size={32} color="orange" />
           }
           repticoes={15}
           serie={4}
-          onPress={() => navigation.navigate('TreinoDesc')}
+          onPress={() =>
+            navigation.navigate('TreinoDesc', {
+              nome: 'Supino em aparelho',
+              musculoAlvo: 'Peitoral',
+              series: 4,
+              repeticoes: 15,
+              peso: '15kg',
+              intervalo: '30-60s',
+              descricao:
+                'Este exercício é para ser feito de forma consicente na questão do peso arrisque peso alto sem uma pessoa treinando contigo.Quando sentir que esse peso já está leve, pode ir aumentando aos poucos, COM SEGURANÇA!',
+              imagem:
+                'https://dicasef.com.br/wp-content/uploads/2024/08/supino-reto-1.jpg',
+              numero: 1
+            })
+          }
         />
       </View>
     </Layout>
