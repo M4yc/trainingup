@@ -17,9 +17,12 @@ export default function AppTabNavigator() {
         tabBarStyle: {
           backgroundColor: '#2E3335',
           height: 56,
-          borderColor: 'black',
-          borderWidth: 0,
-          marginBottom: 18,
+          position: 'absolute',
+          bottom: 0,
+          left: 0,
+          right: 0,
+          borderTopWidth: 0,
+          elevation: 0,
           justifyContent: 'center'
         },
         tabBarItemStyle: {

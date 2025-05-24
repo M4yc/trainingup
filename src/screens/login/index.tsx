@@ -55,7 +55,7 @@ const LoginScreen = () => {
         if (tipo === "Personal") {
           navigation.navigate('PersonalStack');
         } else {
-          navigation.navigate('App');
+          navigation.navigate('AlunoStack');
         }
       } else {
         Alert.alert('Erro', 'Dados do usuário não encontrados');

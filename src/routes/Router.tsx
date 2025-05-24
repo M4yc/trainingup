@@ -5,7 +5,6 @@ import { User } from 'firebase/auth';
 import RegisterScreen from '../screens/register';
 import LoginScreen from '../screens/login';
 import { auth, db } from '../config/FirebaseConfig';
-import AuthStack from './AuthStack';
 import AppStack from './AppStack';
 import PersonalStack from './PersonalStack';
 import { RootStackParamList } from './types';
@@ -47,7 +46,7 @@ export function Router() {
             {userType === 'Personal' ? (
               <Stack.Screen name="PersonalStack" component={PersonalStack} />
             ) : (
-              <Stack.Screen name="App" component={AppStack} />
+              <Stack.Screen name="AlunoStack" component={AppStack} />
             )}
           </>
         )}

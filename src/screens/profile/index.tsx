@@ -8,8 +8,8 @@ import { Feather } from '@expo/vector-icons';
 import Layout from '../../components/layout';
 
 import styles from './style';
-import { auth, db } from '@/src/config/FirebaseConfig';
-import { doc, getDoc } from "firebase/firestore";
+import { auth } from '@/src/config/FirebaseConfig';
+import { userService, Usuario } from '@/src/service/userService';
 
 type MenuItem = {
   icon: keyof typeof Feather.glyphMap;
@@ -17,48 +17,23 @@ type MenuItem = {
   onPress: () => void;
 };
 
-interface Usuario {
-  name?: string;
-  email: string;
-  tipo: "Aluno" | "Personal";
-}
-
-const Perfil = () => {
-  const [usuario, setUsuario] = useState<Usuario | null>(null);
+const Profile = () => {
+  const [user, setUser] = useState<Usuario | null>(null);
   const [loading, setLoading] = useState(true);
 
-  function signOut() {
-    auth.signOut();
-  }
-
   useEffect(() => {
-    const carregarPerfil = async () => {
+    const getUser = async () => {
       try {
-        const user = auth.currentUser;
-
-        if (user) {
-          const docRef = doc(db, "usuarios", user.uid);
-          const docSnap = await getDoc(docRef);
-
-          if (docSnap.exists()) {
-            const data = docSnap.data();
-            setUsuario({
-              name: data.name,
-              email: data.email,
-              tipo: data.tipo
-            });
-          } else {
-            console.warn("Documento do usuário não encontrado");
-          }
-        }
+        const userData = await userService.getCurrentUser();
+        setUser(userData);
       } catch (error) {
-        console.error("Erro ao buscar dados do perfil:", error);
+        console.error("Error loading profile data:", error);
       } finally {
         setLoading(false);
       }
     };
 
-    carregarPerfil();
+    getUser();
   }, []);
 
   if (loading) {
@@ -69,16 +44,14 @@ const Perfil = () => {
     );
   }
 
-  if (!usuario) {
+  if (!user) {
     return (
       <View style={styles.container}>
-        <Text>Usuário não encontrado</Text>
+        <Text>User not found</Text>
       </View>
     );
   }
 
-
- 
   const stats = [
     { value: '45', label: 'Alunos Ativos' },
     { value: '152', label: 'Treinos' },
@@ -103,6 +76,14 @@ const Perfil = () => {
     }
   ];
 
+  const handleSignOut = async () => {
+    try {
+      await auth.signOut();
+    } catch (error) {
+      console.error("Error signing out:", error);
+    }
+  };
+
   return (
     <Layout>
       <SafeAreaView style={{ flex: 1 }}>
@@ -117,15 +98,15 @@ const Perfil = () => {
                 <Feather name="camera" size={20} color="#FFFFFF" />
               </TouchableOpacity>
             </View>
-            <Text style={styles.userName}>{usuario?.name}</Text>
-            <Text style={styles.userEmail}>{usuario?.email}</Text>
+            <Text style={styles.userName}>{user.name || 'Name not set'}</Text>
+            <Text style={styles.userEmail}>{user.email}</Text>
             <View style={styles.statusBadge}>
-              <Text style={styles.statusText}>{usuario?.tipo}</Text>
+              <Text style={styles.statusText}>{user.tipo}</Text>
             </View>
           </View>
 
           <View style={styles.content}>
-            {usuario?.tipo === 'Personal' && (
+            {user.tipo === 'Personal' && (
               <View style={styles.statsContainer}>
                 {stats.map((stat, index) => (
                   <View key={index} style={styles.statItem}>
@@ -164,7 +145,7 @@ const Perfil = () => {
             <View style={styles.menuSection}>
               <TouchableOpacity
                 style={[styles.menuItem, styles.menuItemDanger]}
-                onPress={signOut}
+                onPress={handleSignOut}
               >
                 <View style={styles.menuIcon}>
                   <Feather name="log-out" size={24} color="#FF6B6B" />
@@ -181,4 +162,4 @@ const Perfil = () => {
   );
 };
 
-export default Perfil;
+export default Profile;
