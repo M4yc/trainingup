@@ -16,8 +16,10 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { registerSchema } from '@validations/schemas';
-import { useAuth } from 'src/contexts/Auth';
 import { RootStackParamList } from 'src/routes/types';
+import { auth, db } from '../../config/FirebaseConfig';
+import { createUserWithEmailAndPassword, signOut } from 'firebase/auth';
+import { setDoc, doc } from 'firebase/firestore';
 
 import styles from './style';
 
@@ -33,7 +35,7 @@ type RegisterScreenNavigationProp =
 
 const RegisterScreen = () => {
   const navigation = useNavigation<RegisterScreenNavigationProp>();
-  const [userType, setUserType] = useState<'aluno' | 'personal'>('aluno');
+  const [userType, setUserType] = useState<'Aluno' | 'Personal'>('Aluno');
   const [isLoading, setIsLoading] = useState(false);
 
   const {
@@ -45,10 +47,22 @@ const RegisterScreen = () => {
   });
 
   const onSubmit = async (data: FormData) => {
-    try {
+    try { 
       setIsLoading(true);
-      //await registrarUsuario(data.email, data.password, data.name, userType);
-      Alert.alert('Sucesso', 'Cadastro realizado com sucesso!');
+      const userCredential = await createUserWithEmailAndPassword(auth, data.email, data.password);
+      const user = userCredential.user;
+
+      await setDoc(doc(db, "usuarios", user.uid), {
+        name: data.name,
+        email: data.email,
+        tipo: userType,
+        createdAt: new Date()
+      });
+
+      await signOut(auth);
+      Alert.alert('Sucesso', 'Cadastro realizado com sucesso! Por favor, faça login.');
+      navigation.navigate('Login');
+      
     } catch (error: any) {
       Alert.alert('Erro', error.message || 'Erro ao realizar cadastro');
     } finally {
@@ -149,14 +163,14 @@ const RegisterScreen = () => {
               <TouchableOpacity
                 style={[
                   styles.userTypeButton,
-                  userType === 'aluno' && styles.userTypeButtonActive
+                  userType === 'Aluno' && styles.userTypeButtonActive
                 ]}
-                onPress={() => setUserType('aluno')}
+                onPress={() => setUserType('Aluno')}
               >
                 <Text
                   style={[
                     styles.userTypeText,
-                    userType === 'aluno' && styles.userTypeTextActive
+                    userType === 'Aluno' && styles.userTypeTextActive
                   ]}
                 >
                   Aluno
@@ -165,14 +179,14 @@ const RegisterScreen = () => {
               <TouchableOpacity
                 style={[
                   styles.userTypeButton,
-                  userType === 'personal' && styles.userTypeButtonActive
+                  userType === 'Personal' && styles.userTypeButtonActive
                 ]}
-                onPress={() => setUserType('personal')}
+                onPress={() => setUserType('Personal')}
               >
                 <Text
                   style={[
                     styles.userTypeText,
-                    userType === 'personal' && styles.userTypeTextActive
+                    userType === 'Personal' && styles.userTypeTextActive
                   ]}
                 >
                   Personal

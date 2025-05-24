@@ -6,8 +6,8 @@ import { AuthProvider } from './src/contexts/Auth';
 
 export default function App() {
   return (
-    <AuthProvider>
+    //<AuthProvider>
       <Router />
-    </AuthProvider>
+    //</AuthProvider>
   );
 }

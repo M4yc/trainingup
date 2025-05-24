@@ -1,37 +1,39 @@
 {
   "expo": {
-    "name": "TrainingUP",
+    "name": "trainingup",
     "slug": "trainingup",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
-    "userInterfaceStyle": "dark",
-    "newArchEnabled": true,
+    "userInterfaceStyle": "light",
     "splash": {
       "image": "./assets/splash-icon.png",
       "resizeMode": "contain",
-      "backgroundColor": "#211d28"
+      "backgroundColor": "#ffffff"
     },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "ios": {
-      "bundleIdentifier": "com.trainingup.ios",
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.trainingup"
     },
     "android": {
-      "package": "com.trainingup.android",
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#211d28"
+        "backgroundColor": "#ffffff"
       },
-      "edgeToEdgeEnabled": true
+      "package": "com.trainingup"
     },
-    "web": {
-      "favicon": "./assets/favicon.png"
-    },
-    
+    "plugins": [
+      "expo-dev-client",
+      "expo-font"
+    ],
     "extra": {
       "eas": {
-        "projectId": "1ff3c4ce-7ac1-4199-bbba-e8f86e26f5a4"
+        "projectId": "your-project-id"
       }
-    }
+    },
+    "newArchEnabled": true
   }
 }

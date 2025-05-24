@@ -2,6 +2,7 @@ export type RootStackParamList = {
   Login: undefined;
   Register: undefined;
   App: undefined;
+  PersonalStack: undefined;
 };
 
 export type AppTabParamList = {
