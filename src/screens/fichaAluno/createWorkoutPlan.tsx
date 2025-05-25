@@ -73,34 +73,8 @@ const mascaraData = (valor: string) => {
 export function CreateWorkoutPlan() {
   const navigation = useNavigation<NavigationProp>();
   const route = useRoute<RoutePropType>();
-  const { alunoId, alunoNome } = route.params;
-
-
-  const handleCriar = () => {
-    const alunoId = '33zVVTB7QkRrgwq7YJBQw77kmc62'; // Use o ID do aluno real
-    const nomeFicha = 'Ficha A';
-    const nomeTreino = 'Treino A';
-    const diasSemana = ['segunda', 'quinta'];
-
-    const exercicios = [
-      {
-        nome: 'Supino Reto',
-        series: 4,
-        repeticoes: 12,
-        carga: 60,
-        ordem: 1,
-      },
-      {
-        nome: 'Rosca Direta',
-        series: 3,
-        repeticoes: 10,
-        carga: 15,
-        ordem: 2,
-      },
-    ];
-
-    criarFichaDeTreino(alunoId, nomeFicha, nomeTreino, diasSemana, exercicios);
-  };
+  const { alunoNome } = route.params;
+  const alunoId = '33zVVTB7QkRrgwq7YJBQw77kmc62';
 
   const getNextGroupLetter = (currentGroups: GrupoTreino[]) => {
     const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
@@ -242,9 +216,40 @@ export function CreateWorkoutPlan() {
           <Formik
             initialValues={valoresIniciais}
             validationSchema={fichaTreinoSchema}
-            onSubmit={(values) => {
-              console.log({ ...values, alunoId });
-              navigation.goBack();
+            onSubmit={async (values) => {
+              console.log('Cheguei')
+              try {
+                console.log('📦 Dados brutos do formulário:', values);
+
+                const nomeFicha = `Ficha ${values.grupos.map(g => g.letra).join(', ')}`; // Exemplo: "Ficha A, B"
+                const nomeTreino = values.grupos[0].nome || `Treino ${values.grupos[0].letra}`;
+                const diasSemana = ['segunda', 'quinta']; // Pode adaptar para um campo no formulário depois
+
+                // Transforma os exercícios da ficha (apenas do primeiro grupo por enquanto)
+                const exercicios = values.grupos[0].exercicios.map((ex, index) => ({
+                  nome: ex.nome,
+                  series: Number(ex.series),
+                  repeticoes: Number(ex.repeticoes),
+                  carga: Number(ex.peso) || 0,
+                  ordem: index + 1,
+                  observacoes: '', // Pode adicionar campo no futuro se quiser
+                }));
+
+                console.log('📤 Dados convertidos para envio:', {
+                  alunoId,
+                  nomeFicha,
+                  nomeTreino,
+                  diasSemana,
+                  exercicios,
+                });
+
+                await criarFichaDeTreino(alunoId, nomeFicha, nomeTreino, diasSemana, exercicios);
+
+                console.log('✅ Ficha criada com sucesso!');
+                navigation.goBack();
+              } catch(error){
+                console.error('❌ Erro ao criar ficha:', error);
+              }
             }}
           >
             {({
@@ -428,7 +433,7 @@ export function CreateWorkoutPlan() {
 
                 <TouchableOpacity
                   style={styles.submitButton}
-                  onPress={() => handleCriar()}
+                  onPress={() => handleSubmit}
                 >
                   <Text style={styles.submitButtonText}>Salvar Ficha de Treino</Text>
                 </TouchableOpacity>

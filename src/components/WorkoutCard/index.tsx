@@ -1,34 +1,43 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
 import { StyleSheet } from 'react-native';
 
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+import { Ionicons } from '@expo/vector-icons';
 
 interface WorkoutCardProps {
   title: string;
   exerciseCount: number;
-  lastUpdated: string;
-  onPress: () => void;
+  createDate: string;
 }
 
 const WorkoutCard: React.FC<WorkoutCardProps> = ({
   title,
   exerciseCount,
-  lastUpdated,
-  onPress
+  createDate,
 }) => {
+  const [open, setOpen] = useState(false);
+
   return (
-    <TouchableOpacity style={styles.container} onPress={onPress}>
-      <View style={styles.iconContainer}>
-        <MaterialIcons name="fitness-center" size={32} color="#44BF86" />
-      </View>
-      <View style={styles.infoContainer}>
-        <Text style={styles.title}>{title}</Text>
-        <Text style={styles.subtitle}>{exerciseCount} exercícios</Text>
-        <Text style={styles.date}>Última atualização: {lastUpdated}</Text>
-      </View>
-      <MaterialIcons name="chevron-right" size={24} color="#44BF86" />
-    </TouchableOpacity>
+    <View>
+      <TouchableOpacity style={styles.container} onPress={() => setOpen(!open)}>
+        <View style={styles.iconContainer}>
+          <MaterialIcons name="fitness-center" size={30} color="#44BF86" />
+        </View>
+        <View style={styles.infoContainer}>
+          <Text style={styles.title}>{title}</Text>
+          <Text style={styles.subtitle}>{exerciseCount} exercícios</Text>
+          <Text style={styles.date}>Data de criação: {createDate}</Text>
+        </View>
+        <Ionicons name={open ? "chevron-up" : "chevron-down"} size={24} color="#44BF86" />
+      </TouchableOpacity>
+      {open &&(
+        <View>
+          <Text style={styles.subtitle}>{exerciseCount} exercícios</Text>
+        </View>
+      )}
+    </View>
+    
   );
 };
 
@@ -43,7 +52,7 @@ const styles = StyleSheet.create({
   },
   iconContainer: {
     backgroundColor: 'rgba(68, 191, 134, 0.1)',
-    padding: 12,
+    padding: 10,
     borderRadius: 12,
     marginRight: 16
   },

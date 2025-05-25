@@ -65,7 +65,18 @@ const styles = StyleSheet.create({
   loginLinkText: {
     color: '#4be381',
     fontSize: 14
-  }
+  },
+  personalItem: {
+  padding: 12,
+  borderWidth: 1,
+  borderColor: '#ccc',
+  borderRadius: 10,
+  marginBottom: 10
+},
+personalItemSelected: {
+  backgroundColor: '#007bff',
+  borderColor: '#007bff'
+}
 });
 
 export default styles;

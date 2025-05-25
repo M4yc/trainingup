@@ -127,10 +127,6 @@ export default function DashboardPersonal() {
             />
           </View>
 
-          <TouchableOpacity style={styles.addButton}>
-            <Feather name="plus" size={24} color="#FFFFFF" />
-            <Text style={styles.addButtonText}>Novo Aluno</Text>
-          </TouchableOpacity>
         </ScrollView>
       </SafeAreaView>
     </View>
