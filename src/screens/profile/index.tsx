@@ -1,61 +1,121 @@
 /* eslint-disable @typescript-eslint/no-require-imports */
 import React from 'react';
-import { View, Text, Image } from 'react-native';
+import { View, Text, Image, TouchableOpacity, ScrollView } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { Ionicons } from '@expo/vector-icons';
+import { Feather } from '@expo/vector-icons';
 
 import Layout from '../../components/layout';
-import MenuOptions from '../../components/menuOptions';
 import { useAuth } from '../../contexts/Auth';
 import styles from './style';
 
-const Perfil = () => {
-  const { signOut } = useAuth();
-  const { authData } = useAuth();
+type MenuItem = {
+  icon: keyof typeof Feather.glyphMap;
+  text: string;
+  onPress: () => void;
+};
 
-  const botoes = [
+const Perfil = () => {
+  const { signOut, authData } = useAuth();
+
+  const stats = [
+    { value: '45', label: 'Alunos Ativos' },
+    { value: '152', label: 'Treinos' },
+    { value: '12', label: 'Anos Exp.' }
+  ];
+
+  const menuItems: MenuItem[] = [
     {
-      text: 'Editar perfil',
-      onPress: () => null,
-      icon: <Ionicons name="person" size={20} color={'white'} />
+      icon: 'user',
+      text: 'Editar Perfil',
+      onPress: () => null
     },
     {
+      icon: 'settings',
       text: 'Configurações',
-      onPress: () => null,
-      icon: <Ionicons name="settings" size={20} color={'white'} />
+      onPress: () => null
     },
     {
-      text: 'Sobre',
-      onPress: () => null,
-      icon: <Ionicons name="alert-circle" size={20} color={'white'} />
-    },
-    {
-      text: 'Sair',
-      onPress: signOut,
-      icon: <Ionicons name="exit-outline" size={20} color={'white'} />
+      icon: 'help-circle',
+      text: 'Ajuda e Suporte',
+      onPress: () => null
     }
   ];
 
   return (
     <Layout>
-      <View style={styles.container}>
-        <Image
-          source={require('../../assets/imgs/userProfile.jpg')}
-          style={{ width: 64, height: 64, borderRadius: 999 }}
-        />
-        <Text style={{ color: 'white' }}>{authData?.name}</Text>
-        <Text style={styles.text}>Perfil</Text>
-        <View style={styles.buttons}>
-          {botoes.map((item) => (
-            <MenuOptions
-              key={item.text}
-              text={item.text}
-              onPress={item.onPress}
-              icon={item.icon}
-            />
-          ))}
-        </View>
-      </View>
+      <SafeAreaView style={{ flex: 1 }}>
+        <ScrollView style={styles.container}>
+          <View style={styles.header}>
+            <View style={styles.avatarContainer}>
+              <Image
+                source={require('../../assets/imgs/userProfile.jpg')}
+                style={styles.avatar}
+              />
+              <TouchableOpacity style={styles.editAvatarButton}>
+                <Feather name="camera" size={20} color="#FFFFFF" />
+              </TouchableOpacity>
+            </View>
+            <Text style={styles.userName}>{authData?.name}</Text>
+            <Text style={styles.userEmail}>{authData?.email}</Text>
+            <View style={styles.statusBadge}>
+              <Text style={styles.statusText}>{authData?.userType}</Text>
+            </View>
+          </View>
+
+          <View style={styles.content}>
+            {authData?.userType === 'personal' && (
+              <View style={styles.statsContainer}>
+                {stats.map((stat, index) => (
+                  <View key={index} style={styles.statItem}>
+                    <Text style={styles.statValue}>{stat.value}</Text>
+                    <Text style={styles.statLabel}>{stat.label}</Text>
+                  </View>
+                ))}
+              </View>
+            )}
+
+            <Text style={styles.sectionTitle}>Menu</Text>
+            <View style={styles.menuSection}>
+              {menuItems.map((item, index) => (
+                <TouchableOpacity
+                  key={index}
+                  style={[
+                    styles.menuItem,
+                    index === menuItems.length - 1 && styles.menuItemLast
+                  ]}
+                  onPress={item.onPress}
+                >
+                  <View style={styles.menuIcon}>
+                    <Feather name={item.icon} size={24} color="#44BF86" />
+                  </View>
+                  <Text style={styles.menuText}>{item.text}</Text>
+                  <Feather
+                    name="chevron-right"
+                    size={20}
+                    color="#FFFFFF"
+                    style={styles.chevronIcon}
+                  />
+                </TouchableOpacity>
+              ))}
+            </View>
+
+            <View style={styles.menuSection}>
+              <TouchableOpacity
+                style={[styles.menuItem, styles.menuItemDanger]}
+                onPress={signOut}
+              >
+                <View style={styles.menuIcon}>
+                  <Feather name="log-out" size={24} color="#FF6B6B" />
+                </View>
+                <Text style={[styles.menuText, styles.menuTextDanger]}>
+                  Sair da Conta
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </ScrollView>
+      </SafeAreaView>
     </Layout>
   );
 };

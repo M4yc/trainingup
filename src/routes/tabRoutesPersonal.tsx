@@ -1,42 +1,66 @@
-import Colors from '@constants/colors';
 import { MaterialIcons } from '@expo/vector-icons';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import Dashboard from '@screens/dashboard';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import AlunosScreen from '@screens/alunos';
 import DashboardPersonal from '@screens/dashboardPersonal';
 import Estatistica from '@screens/estatistica';
-import FichaTreino from '@screens/fichaTreino';
+import NovoAluno from '@screens/novoAluno';
 import Perfil from '@screens/profile';
 
-import { AppTabParamList } from './types';
+const Colors = {
+  fundo: '#211d28',
+  primary: '#44BF86',
+  auxiliar: '#00908E',
+  white: '#FFFFFF',
+  bordas: '#333333',
+  auxiliar2: '#2A2634',
+  inactive: '#666666'
+};
 
-const Tab = createBottomTabNavigator<AppTabParamList>();
+const Tab = createBottomTabNavigator();
+const Stack = createNativeStackNavigator();
+
+function AlunosNavigator() {
+  return (
+    <Stack.Navigator
+      screenOptions={{
+        headerShown: false,
+        animation: 'slide_from_right'
+      }}
+    >
+      <Stack.Screen name="ListaAlunos" component={AlunosScreen} />
+      <Stack.Screen name="NovoAluno" component={NovoAluno} />
+    </Stack.Navigator>
+  );
+}
 
 export default function AppTabNavigatorPersonal() {
   return (
     <Tab.Navigator
       screenOptions={{
         tabBarStyle: {
-          backgroundColor: '#2E3335',
-          height: 56,
-          borderColor: 'black',
-          borderWidth: 0,
-          marginBottom: 18,
-          justifyContent: 'center'
+          backgroundColor: Colors.fundo,
+          height: 65,
+          borderTopWidth: 1,
+          borderTopColor: Colors.bordas,
+          paddingBottom: 10,
+          paddingTop: 10,
+          position: 'absolute',
+          bottom: 0,
+          left: 0,
+          right: 0,
+          elevation: 0,
+          shadowOpacity: 0,
+          zIndex: 999
         },
         tabBarItemStyle: {
-          height: '100%',
-          padding: 0,
-          justifyContent: 'center',
-          paddingBottom: 4
+          paddingTop: 0,
+          paddingBottom: 0
         },
-        tabBarIconStyle: {},
-        tabBarLabelStyle: {
-          display: 'none',
-          opacity: 0,
-          height: 0
-        },
-        tabBarShowLabel: false,
         tabBarActiveTintColor: Colors.primary,
+        tabBarInactiveTintColor: Colors.inactive,
+        headerShown: false,
+        tabBarShowLabel: false,
         tabBarHideOnKeyboard: true
       }}
     >
@@ -44,19 +68,17 @@ export default function AppTabNavigatorPersonal() {
         name="Dashboard"
         component={DashboardPersonal}
         options={{
-          headerShown: false,
           tabBarIcon: ({ color, size }) => (
-            <MaterialIcons name="home" size={32} color={color} />
+            <MaterialIcons name="dashboard" size={28} color={color} />
           )
         }}
       />
       <Tab.Screen
-        name="FichaTreino"
-        component={FichaTreino}
+        name="Alunos"
+        component={AlunosNavigator}
         options={{
-          headerShown: false,
           tabBarIcon: ({ color }) => (
-            <MaterialIcons name="content-paste" size={32} color={color} />
+            <MaterialIcons name="people" size={28} color={color} />
           )
         }}
       />
@@ -64,9 +86,8 @@ export default function AppTabNavigatorPersonal() {
         name="Estatistica"
         component={Estatistica}
         options={{
-          headerShown: false,
           tabBarIcon: ({ color }) => (
-            <MaterialIcons name="show-chart" size={32} color={color} />
+            <MaterialIcons name="insert-chart" size={28} color={color} />
           )
         }}
       />
@@ -74,9 +95,8 @@ export default function AppTabNavigatorPersonal() {
         name="Perfil"
         component={Perfil}
         options={{
-          headerShown: false,
           tabBarIcon: ({ color }) => (
-            <MaterialIcons name="person" size={32} color={color} />
+            <MaterialIcons name="person" size={28} color={color} />
           )
         }}
       />

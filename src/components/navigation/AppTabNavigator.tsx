@@ -4,7 +4,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Colors from '../../constants/colors';
 import Dashboard from '../../screens/dashboard';
 import Estatistica from '../../screens/estatistica';
-import FichaTreino from '../../screens/fichaTreino';
+import TreinosScreen from '../../screens/fichaTreino';
 import Perfil from '../../screens/profile';
 import styles from './style';
 import { AppTabParamList } from './types';
@@ -51,8 +51,8 @@ export default function AppTabNavigator() {
         }}
       />
       <Tab.Screen
-        name="FichaTreino"
-        component={FichaTreino}
+        name="TreinosScreen"
+        component={TreinosScreen}
         options={{
           headerShown: false,
           tabBarIcon: ({ color }) => (

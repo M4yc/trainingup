@@ -7,8 +7,11 @@ import Button from '@components//button';
 import Layout from '@components/layout';
 import Colors from '@constants/colors';
 import { yupResolver } from '@hookform/resolvers/yup';
+import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { loginSchema } from '@validations/schemas';
 import { useAuth } from 'src/contexts/Auth';
+import { RootStackParamList } from 'src/routes/types';
 
 import styles from './style';
 
@@ -17,8 +20,11 @@ type FormData = {
   password: string;
 };
 
+type LoginScreenNavigationProp = NativeStackNavigationProp<RootStackParamList>;
+
 const LoginScreen = () => {
   const { signIn } = useAuth();
+  const navigation = useNavigation<LoginScreenNavigationProp>();
   const {
     control,
     handleSubmit,
@@ -102,7 +108,10 @@ const LoginScreen = () => {
 
           <View style={{ flexDirection: 'row', gap: 10 }}>
             <Text style={{ color: Colors.white }}>Não tem uma conta?</Text>
-            <Text style={{ color: Colors.primary }} onPress={() => null}>
+            <Text
+              style={{ color: Colors.primary }}
+              onPress={() => navigation.navigate('Register')}
+            >
               Criar uma conta
             </Text>
           </View>

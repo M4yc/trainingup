@@ -1,13 +1,15 @@
 export type RootStackParamList = {
   Login: undefined;
+  Register: undefined;
   App: undefined;
 };
 
 export type AppTabParamList = {
   Dashboard: undefined;
-  FichaTreino: undefined;
+  TreinosScreen: undefined;
   Estatistica: undefined;
   Perfil: undefined;
+  Alunos: undefined;
 };
 
 export type AppStackParamList = {
@@ -26,4 +28,7 @@ export type AppStackParamList = {
   Configuracoes: undefined;
   Exercicio: undefined;
   Corpo: undefined;
+  FichaTreinoAluno: undefined;
+  CreateWorkoutPlan: undefined;
+  NovaFichaTreino: undefined;
 };

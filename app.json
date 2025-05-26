@@ -1,16 +1,16 @@
 {
   "expo": {
-    "name": "trainingup",
+    "name": "TrainingUP",
     "slug": "trainingup",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
-    "userInterfaceStyle": "light",
+    "userInterfaceStyle": "dark",
     "newArchEnabled": true,
     "splash": {
       "image": "./assets/splash-icon.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#211d28"
     },
     "ios": {
       "bundleIdentifier": "com.trainingup.ios",
@@ -20,7 +20,7 @@
       "package": "com.trainingup.android",
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
+        "backgroundColor": "#211d28"
       },
       "edgeToEdgeEnabled": true
     },

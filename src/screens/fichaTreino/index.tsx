@@ -1,8 +1,8 @@
 import React from 'react';
-import { View, Text } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity } from 'react-native';
 
-import ButtonExe from '@components/buttonExe';
 import Layout from '@components/layout';
+import WorkoutCard from '@components/WorkoutCard';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -12,41 +12,58 @@ import styles from './style';
 
 type NavigationProp = NativeStackNavigationProp<AppStackParamList>;
 
-const FichaTreino = () => {
+// Dados mockados para exemplo
+const mockWorkouts = [
+  {
+    id: '1',
+    title: 'Segunda-Feira - Superior',
+    exerciseCount: 8,
+    lastUpdated: '15/03/2024'
+  },
+  {
+    id: '2',
+    title: 'Terça-Feira - Inferior',
+    exerciseCount: 6,
+    lastUpdated: '15/03/2024'
+  },
+  {
+    id: '3',
+    title: 'Quarta-Feira - Full Body',
+    exerciseCount: 10,
+    lastUpdated: '15/03/2024'
+  }
+];
+
+const FichaTreinoScreen = () => {
   const navigation = useNavigation<NavigationProp>();
 
   return (
     <Layout>
-      <View style={styles.containerTitle}>
-        <Text style={styles.titleText}>Segunda-Feira</Text>
+      <View style={styles.header}>
+        <Text style={styles.title}>Fichas de Treino</Text>
+        <Text style={styles.subtitle}>Gerencie os treinos do seu aluno</Text>
       </View>
-      <View style={styles.content}>
-        <ButtonExe
-          nameExe="Supino em aparelho"
-          icon={
-            <MaterialIcons name="sports-handball" size={32} color="orange" />
-          }
-          repticoes={15}
-          serie={4}
-          onPress={() =>
-            navigation.navigate('TreinoDesc', {
-              nome: 'Supino em aparelho',
-              musculoAlvo: 'Peitoral',
-              series: 4,
-              repeticoes: 15,
-              peso: '15kg',
-              intervalo: '30-60s',
-              descricao:
-                'Este exercício é para ser feito de forma consicente na questão do peso arrisque peso alto sem uma pessoa treinando contigo.Quando sentir que esse peso já está leve, pode ir aumentando aos poucos, COM SEGURANÇA!',
-              imagem:
-                'https://dicasef.com.br/wp-content/uploads/2024/08/supino-reto-1.jpg',
-              numero: 1
-            })
-          }
-        />
-      </View>
+
+      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+        {mockWorkouts.map((workout) => (
+          <WorkoutCard
+            key={workout.id}
+            title={workout.title}
+            exerciseCount={workout.exerciseCount}
+            lastUpdated={workout.lastUpdated}
+            onPress={() => navigation.navigate('TreinoDesc')}
+          />
+        ))}
+      </ScrollView>
+
+      <TouchableOpacity
+        style={styles.fab}
+        onPress={() => navigation.navigate('NovaFichaTreino')}
+      >
+        <MaterialIcons name="add" size={24} color="#fff" />
+      </TouchableOpacity>
     </Layout>
   );
 };
 
-export default FichaTreino;
+export default FichaTreinoScreen;
