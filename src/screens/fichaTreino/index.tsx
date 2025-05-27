@@ -72,7 +72,7 @@ const FichaTreinoScreen = () => {
     }
 
     carregarFichas();
-  }, []);
+  }, [alunoId]);
 
   return (
     <Layout>
