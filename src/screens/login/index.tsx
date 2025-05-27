@@ -121,7 +121,7 @@ const LoginScreen = () => {
           </View>
           <View style={styles.containerEscSenha}>
             <Text onPress={() => null} style={styles.textEscSenha}>
-              Esquecu a senha?
+              Esqueceu a senha?
             </Text>
           </View>
 
