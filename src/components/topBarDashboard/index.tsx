@@ -1,20 +1,30 @@
 /* eslint-disable @typescript-eslint/no-require-imports */
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, Image } from 'react-native';
 
 import { Ionicons } from '@expo/vector-icons';
-import { useAuth } from 'src/contexts/Auth';
 
 import Colors from '../../constants/colors';
 import styles from './style';
+import { userService, Usuario } from '@/src/service/userService';
 
 const TopBarDashboard: React.FC = () => {
-  const { authData } = useAuth();
+  const [user, setUser] = useState<Usuario | null>(null);
+
+  useEffect(() => {
+    const getUser = async () => {
+      const userData = await userService.getCurrentUser();
+      setUser(userData);
+    };
+
+    getUser();
+  }, []);
+
   return (
     <View style={styles.topBar}>
       <View>
         <Text style={styles.textWelcome}>Bem vindo de volta!</Text>
-        <Text style={styles.textName}>{authData?.name}</Text>
+        <Text style={styles.textName}>{user?.name || 'Usuário'}</Text>
       </View>
       <View>
         <Image

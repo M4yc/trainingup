@@ -57,12 +57,6 @@ const dadosExemplo = {
       icone: 'calendar' as keyof typeof Feather.glyphMap,
       cor: '#00908E'
     },
-    {
-      titulo: 'Avaliações Pendentes',
-      valor: 3,
-      icone: 'clipboard' as keyof typeof Feather.glyphMap,
-      cor: '#FF6B6B'
-    }
   ]
 };
 
@@ -106,12 +100,6 @@ export default function DashboardPersonal() {
         <ScrollView contentContainerStyle={styles.scrollContent}>
           <View style={styles.header}>
             <Text style={styles.title}>Dashboard</Text>
-            <TouchableOpacity style={styles.notificationButton}>
-              <Feather name="bell" size={24} color="#FFFFFF" />
-              <View style={styles.notificationBadge}>
-                <Text style={styles.notificationText}>3</Text>
-              </View>
-            </TouchableOpacity>
           </View>
 
           <FlatList
@@ -139,10 +127,6 @@ export default function DashboardPersonal() {
             />
           </View>
 
-          <TouchableOpacity style={styles.addButton}>
-            <Feather name="plus" size={24} color="#FFFFFF" />
-            <Text style={styles.addButtonText}>Novo Aluno</Text>
-          </TouchableOpacity>
         </ScrollView>
       </SafeAreaView>
     </View>

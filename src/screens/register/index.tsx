@@ -1,25 +1,29 @@
-import React, { useState } from 'react';
-import { Controller, useForm } from 'react-hook-form';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
   TextInput,
   Image,
   TouchableOpacity,
-  Alert
+  Alert,
+  ScrollView
 } from 'react-native';
+
+import { Controller, useForm } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
+import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+
+import { createUserWithEmailAndPassword, signOut } from 'firebase/auth';
+import { setDoc, doc, collection, getDocs, query, where } from 'firebase/firestore';
 
 import IconApp from '@assets/Icon_app.png';
 import Button from '@components/button';
 import Layout from '@components/layout';
-import { yupResolver } from '@hookform/resolvers/yup';
-import { useNavigation } from '@react-navigation/native';
-import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { registerSchema } from '@validations/schemas';
-import { useAuth } from 'src/contexts/Auth';
 import { RootStackParamList } from 'src/routes/types';
+import { auth, db } from '../../config/FirebaseConfig';
 
-import { registrarUsuario } from '../../service/authService2';
 import styles from './style';
 
 type FormData = {
@@ -34,7 +38,10 @@ type RegisterScreenNavigationProp =
 
 const RegisterScreen = () => {
   const navigation = useNavigation<RegisterScreenNavigationProp>();
-  const [userType, setUserType] = useState<'aluno' | 'personal'>('aluno');
+  const [step, setStep] = useState(1);
+  const [userType, setUserType] = useState<'Aluno' | 'Personal'>('Aluno');
+  const [personals, setPersonals] = useState<any[]>([]);
+  const [selectedPersonalId, setSelectedPersonalId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
   const {
@@ -45,11 +52,52 @@ const RegisterScreen = () => {
     resolver: yupResolver(registerSchema)
   });
 
+  useEffect(() => {
+    const fetchPersonals = async () => {
+      if (step !== 2) return;
+      try {
+        const q = query(collection(db, 'usuarios'), where('tipo', '==', 'Personal'));
+        const querySnapshot = await getDocs(q);
+        const list = querySnapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        }));
+        setPersonals(list);
+      } catch (error) {
+        console.error('Erro ao buscar personais:', error);
+      }
+    };
+
+    fetchPersonals();
+  }, [step]);
+
   const onSubmit = async (data: FormData) => {
     try {
+      if (userType === 'Aluno' && !selectedPersonalId) {
+        Alert.alert('Atenção', 'Selecione um personal para continuar.');
+        return;
+      }
+
       setIsLoading(true);
-      //await registrarUsuario(data.email, data.password, data.name, userType);
-      Alert.alert('Sucesso', 'Cadastro realizado com sucesso!');
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        data.email,
+        data.password
+      );
+
+      const user = userCredential.user;
+
+      await setDoc(doc(db, 'usuarios', user.uid), {
+        name: data.name,
+        email: data.email,
+        tipo: userType,
+        personalId: userType === 'Aluno' ? selectedPersonalId : null,
+        createdAt: new Date()
+      });
+
+      await signOut(auth);
+      Alert.alert('Sucesso', 'Cadastro realizado com sucesso! Por favor, faça login.');
+      navigation.navigate('Login');
     } catch (error: any) {
       Alert.alert('Erro', error.message || 'Erro ao realizar cadastro');
     } finally {
@@ -59,133 +107,177 @@ const RegisterScreen = () => {
 
   return (
     <Layout>
-      <View style={styles.container}>
+      <ScrollView contentContainerStyle={styles.container}>
         <View style={styles.content}>
           <Image source={IconApp} style={{ width: 150, height: 150 }} />
 
           <View style={{ width: '100%', gap: 20 }}>
-            <View>
-              <Controller
-                control={control}
-                name="name"
-                render={({ field: { onChange, value } }) => (
-                  <TextInput
-                    placeholder="Nome completo"
-                    style={styles.input}
-                    placeholderTextColor="#aaa"
-                    value={value}
-                    onChangeText={onChange}
+            {step === 1 && (
+              <>
+                <View>
+                  <Controller
+                    control={control}
+                    name="name"
+                    render={({ field: { onChange, value } }) => (
+                      <TextInput
+                        placeholder="Nome completo"
+                        style={styles.input}
+                        placeholderTextColor="#aaa"
+                        value={value}
+                        onChangeText={onChange}
+                      />
+                    )}
                   />
-                )}
-              />
-              {errors.name && (
-                <Text style={styles.errorText}>{errors.name.message}</Text>
-              )}
-            </View>
+                  {errors.name && <Text style={styles.errorText}>{errors.name.message}</Text>}
+                </View>
 
-            <View>
-              <Controller
-                control={control}
-                name="email"
-                render={({ field: { onChange, value } }) => (
-                  <TextInput
-                    placeholder="E-mail"
-                    style={styles.input}
-                    placeholderTextColor="#aaa"
-                    value={value}
-                    onChangeText={onChange}
-                    keyboardType="email-address"
-                    autoCapitalize="none"
+                <View>
+                  <Controller
+                    control={control}
+                    name="email"
+                    render={({ field: { onChange, value } }) => (
+                      <TextInput
+                        placeholder="E-mail"
+                        style={styles.input}
+                        placeholderTextColor="#aaa"
+                        value={value}
+                        onChangeText={onChange}
+                        keyboardType="email-address"
+                        autoCapitalize="none"
+                      />
+                    )}
                   />
-                )}
-              />
-              {errors.email && (
-                <Text style={styles.errorText}>{errors.email.message}</Text>
-              )}
-            </View>
+                  {errors.email && <Text style={styles.errorText}>{errors.email.message}</Text>}
+                </View>
 
-            <View>
-              <Controller
-                control={control}
-                name="password"
-                render={({ field: { onChange, value } }) => (
-                  <TextInput
-                    placeholder="Senha"
-                    style={styles.input}
-                    placeholderTextColor="#aaa"
-                    value={value}
-                    onChangeText={onChange}
-                    secureTextEntry
+                <View>
+                  <Controller
+                    control={control}
+                    name="password"
+                    render={({ field: { onChange, value } }) => (
+                      <TextInput
+                        placeholder="Senha"
+                        style={styles.input}
+                        placeholderTextColor="#aaa"
+                        value={value}
+                        onChangeText={onChange}
+                        secureTextEntry
+                      />
+                    )}
                   />
-                )}
-              />
-              {errors.password && (
-                <Text style={styles.errorText}>{errors.password.message}</Text>
-              )}
-            </View>
+                  {errors.password && (
+                    <Text style={styles.errorText}>{errors.password.message}</Text>
+                  )}
+                </View>
 
-            <View>
-              <Controller
-                control={control}
-                name="confirmPassword"
-                render={({ field: { onChange, value } }) => (
-                  <TextInput
-                    placeholder="Confirmar senha"
-                    style={styles.input}
-                    placeholderTextColor="#aaa"
-                    value={value}
-                    onChangeText={onChange}
-                    secureTextEntry
+                <View>
+                  <Controller
+                    control={control}
+                    name="confirmPassword"
+                    render={({ field: { onChange, value } }) => (
+                      <TextInput
+                        placeholder="Confirmar senha"
+                        style={styles.input}
+                        placeholderTextColor="#aaa"
+                        value={value}
+                        onChangeText={onChange}
+                        secureTextEntry
+                      />
+                    )}
                   />
+                  {errors.confirmPassword && (
+                    <Text style={styles.errorText}>{errors.confirmPassword.message}</Text>
+                  )}
+                </View>
+
+                <View style={styles.userTypeContainer}>
+                  <TouchableOpacity
+                    style={[
+                      styles.userTypeButton,
+                      userType === 'Aluno' && styles.userTypeButtonActive
+                    ]}
+                    onPress={() => setUserType('Aluno')}
+                  >
+                    <Text
+                      style={[
+                        styles.userTypeText,
+                        userType === 'Aluno' && styles.userTypeTextActive
+                      ]}
+                    >
+                      Aluno
+                    </Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={[
+                      styles.userTypeButton,
+                      userType === 'Personal' && styles.userTypeButtonActive
+                    ]}
+                    onPress={() => setUserType('Personal')}
+                  >
+                    <Text
+                      style={[
+                        styles.userTypeText,
+                        userType === 'Personal' && styles.userTypeTextActive
+                      ]}
+                    >
+                      Personal
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+
+                <Button
+                  text={userType === 'Aluno' ? 'Próximo' : isLoading ? 'Cadastrando...' : 'Cadastrar'}
+                  onPress={
+                    userType === 'Aluno'
+                      ? () => setStep(2)
+                      : handleSubmit(onSubmit)
+                  }
+                  style={{ opacity: isLoading ? 0.7 : 1 }}
+                />
+              </>
+            )}
+
+            {step === 2 && userType === 'Aluno' && (
+              <>
+                <Text style={{}}>Escolha seu Personal</Text>
+
+                {personals.length === 0 ? (
+                  <Text style={{ textAlign: 'center', color: '#999' }}>
+                    Carregando personais...
+                  </Text>
+                ) : (
+                  personals.map((personal) => (
+                    <TouchableOpacity
+                      key={personal.id}
+                      style={[
+                        styles.personalItem,
+                        selectedPersonalId === personal.id && styles.personalItemSelected
+                      ]}
+                      onPress={() => setSelectedPersonalId(personal.id)}
+                    >
+                      <Text
+                        style={{
+                          color: selectedPersonalId === personal.id ? '#fff' : '#333'
+                        }}
+                      >
+                        {personal.name}
+                      </Text>
+                    </TouchableOpacity>
+                  ))
                 )}
-              />
-              {errors.confirmPassword && (
-                <Text style={styles.errorText}>
-                  {errors.confirmPassword.message}
-                </Text>
-              )}
-            </View>
 
-            <View style={styles.userTypeContainer}>
-              <TouchableOpacity
-                style={[
-                  styles.userTypeButton,
-                  userType === 'aluno' && styles.userTypeButtonActive
-                ]}
-                onPress={() => setUserType('aluno')}
-              >
-                <Text
-                  style={[
-                    styles.userTypeText,
-                    userType === 'aluno' && styles.userTypeTextActive
-                  ]}
-                >
-                  Aluno
-                </Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[
-                  styles.userTypeButton,
-                  userType === 'personal' && styles.userTypeButtonActive
-                ]}
-                onPress={() => setUserType('personal')}
-              >
-                <Text
-                  style={[
-                    styles.userTypeText,
-                    userType === 'personal' && styles.userTypeTextActive
-                  ]}
-                >
-                  Personal
-                </Text>
-              </TouchableOpacity>
-            </View>
+                <Button
+                  text={isLoading ? 'Cadastrando...' : 'Finalizar Cadastro'}
+                  onPress={handleSubmit(onSubmit)}
+                  style={{ opacity: isLoading || !selectedPersonalId ? 0.7 : 1 }}
+                  // disabled={!selectedPersonalId || isLoading}
+                />
 
-            <Button
-              text={isLoading ? 'Cadastrando...' : 'Cadastrar'}
-              onPress={handleSubmit(onSubmit)}
-              style={{ opacity: isLoading ? 0.7 : 1 }}
-            />
+                <TouchableOpacity onPress={() => setStep(1)}>
+                  <Text style={styles.loginLinkText}>Voltar</Text>
+                </TouchableOpacity>
+              </>
+            )}
 
             <TouchableOpacity
               style={styles.loginLink}
@@ -200,7 +292,7 @@ const RegisterScreen = () => {
             </TouchableOpacity>
           </View>
         </View>
-      </View>
+      </ScrollView>
     </Layout>
   );
 };

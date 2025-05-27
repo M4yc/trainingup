@@ -1,7 +1,8 @@
 export type RootStackParamList = {
   Login: undefined;
   Register: undefined;
-  App: undefined;
+  AlunoStack: undefined;
+  PersonalStack: undefined;
 };
 
 export type AppTabParamList = {

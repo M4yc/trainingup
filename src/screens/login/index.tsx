@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-require-imports */
 import React from 'react';
 import { Controller, useForm } from 'react-hook-form';
-import { View, Text, TextInput, Image } from 'react-native';
+import { View, Text, TextInput, Image, Alert } from 'react-native';
 
 import Button from '@components//button';
 import Layout from '@components/layout';
@@ -10,10 +10,16 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { loginSchema } from '@validations/schemas';
-import { useAuth } from 'src/contexts/Auth';
+
 import { RootStackParamList } from 'src/routes/types';
+import { auth, db } from '../../config/FirebaseConfig';
+import { signInWithEmailAndPassword } from 'firebase/auth';
 
 import styles from './style';
+import AppStack from '@/src/routes/AppStack';
+import { getDoc } from 'firebase/firestore';
+import { doc } from 'firebase/firestore';
+import PersonalStack from '@/src/routes/PersonalStack';
 
 type FormData = {
   email: string;
@@ -23,7 +29,7 @@ type FormData = {
 type LoginScreenNavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
 const LoginScreen = () => {
-  const { signIn } = useAuth();
+
   const navigation = useNavigation<LoginScreenNavigationProp>();
   const {
     control,
@@ -35,9 +41,29 @@ const LoginScreen = () => {
 
   const onSubmit = async (data: FormData) => {
     try {
-      await signIn(data.email, data.password);
-    } catch (error) {
+      const userCredential = await signInWithEmailAndPassword(auth, data.email, data.password);
+      const user = userCredential.user;
+      
+      const docRef = doc(db, "usuarios", user.uid);
+      const docSnap = await getDoc(docRef);
+
+      if (docSnap.exists()) {
+        const tipo = docSnap.data().tipo;
+        console.log("Usuário logado como:", tipo);
+
+        // Redirecione com base no tipo
+        if (tipo === "Personal") {
+          navigation.navigate('PersonalStack');
+        } else {
+          navigation.navigate('AlunoStack');
+        }
+      } else {
+        Alert.alert('Erro', 'Dados do usuário não encontrados');
+      }
+      
+    } catch (error: any) {
       console.error('Erro no login:', error);
+      Alert.alert('Erro', error.message || 'Erro ao fazer login');
     }
   };
   return (

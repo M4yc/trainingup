@@ -5,19 +5,17 @@ import {
   ScrollView,
   TouchableOpacity,
   TextInput,
-  NativeSyntheticEvent,
-  TextInputFocusEventData
+  StyleSheet
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-
 import Colors from '@constants/colors';
 import { Feather } from '@expo/vector-icons';
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { Formik } from 'formik';
 import { fichaTreinoSchema } from '@validations/schemas';
-import { Formik, FormikHelpers, FormikProps } from 'formik';
-
 import { styles } from './styles';
+import { criarFichaDeTreino } from '@/src/service/testService';
 
 type RootStackParamList = {
   CreateWorkoutPlan: {
@@ -26,10 +24,7 @@ type RootStackParamList = {
   };
 };
 
-type NavigationProp = NativeStackNavigationProp<
-  RootStackParamList,
-  'CreateWorkoutPlan'
->;
+type NavigationProp = NativeStackNavigationProp<RootStackParamList, 'CreateWorkoutPlan'>;
 type RoutePropType = RouteProp<RootStackParamList, 'CreateWorkoutPlan'>;
 
 interface Exercicio {
@@ -40,59 +35,222 @@ interface Exercicio {
   descanso: string;
 }
 
+interface GrupoTreino {
+  letra: string;
+  nome: string;
+  foco: string;
+  exercicios: Exercicio[];
+}
+
 interface FichaTreino {
   nomeAluno: string;
   objetivo: string;
   dataInicial: string;
   dataFinal: string;
-  exercicios: Exercicio[];
+  grupos: GrupoTreino[];
 }
+
+const mascaraData = (valor: string) => {
+  // Remove tudo que não for número
+  const apenasNumeros = valor.replace(/\D/g, '');
+  
+  // Aplica a máscara DD/MM/AAAA
+  let dataFormatada = apenasNumeros;
+  if (apenasNumeros.length > 0) {
+    // Adiciona a primeira barra após o dia
+    if (apenasNumeros.length > 2) {
+      dataFormatada = `${apenasNumeros.substring(0, 2)}/${apenasNumeros.substring(2)}`;
+    }
+    // Adiciona a segunda barra após o mês
+    if (apenasNumeros.length > 4) {
+      dataFormatada = `${dataFormatada.substring(0, 5)}/${apenasNumeros.substring(4, 8)}`;
+    }
+  }
+  
+  return dataFormatada;
+};
 
 export function CreateWorkoutPlan() {
   const navigation = useNavigation<NavigationProp>();
   const route = useRoute<RoutePropType>();
-  const { alunoId, alunoNome } = route.params;
+  const { alunoNome } = route.params;
+  const alunoId = '33zVVTB7QkRrgwq7YJBQw77kmc62';
+
+  const getNextGroupLetter = (currentGroups: GrupoTreino[]) => {
+    const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    const usedLetters = currentGroups.map(group => group.letra);
+    return letters.split('').find(letter => !usedLetters.includes(letter)) || 'A';
+  };
 
   const valoresIniciais: FichaTreino = {
     nomeAluno: alunoNome,
     objetivo: '',
     dataInicial: '',
     dataFinal: '',
-    exercicios: [
+    grupos: [
       {
+        letra: 'A',
         nome: '',
-        series: '',
-        repeticoes: '',
-        peso: '',
-        descanso: ''
+        foco: '',
+        exercicios: [
+          {
+            nome: '',
+            series: '',
+            repeticoes: '',
+            peso: '',
+            descanso: ''
+          }
+        ]
       }
     ]
   };
 
-  const handleSubmit = (
-    valores: FichaTreino,
-    helpers: FormikHelpers<FichaTreino>
-  ) => {
-    console.log({ ...valores, alunoId });
-    // Aqui você implementará a lógica para salvar a ficha de treino
-    navigation.goBack();
-  };
+  const renderExercicio = (
+    exercicio: Exercicio,
+    grupoIndex: number,
+    exercicioIndex: number,
+    setFieldValue: any,
+    handleChange: any,
+    handleBlur: any,
+    values: FichaTreino
+  ) => (
+    <View key={exercicioIndex} style={styles.exerciseCard}>
+      <View style={styles.exerciseHeader}>
+        <Text style={styles.exerciseNumber}>Exercício {exercicioIndex + 1}</Text>
+        {exercicioIndex > 0 && (
+          <TouchableOpacity
+            onPress={() => {
+              const novosExercicios = values.grupos[grupoIndex].exercicios.filter(
+                (_: Exercicio, index: number) => index !== exercicioIndex
+              );
+              setFieldValue(`grupos.${grupoIndex}.exercicios`, novosExercicios);
+            }}
+            style={styles.removeButton}
+          >
+            <Feather name="trash-2" size={20} color="#FF6B6B" />
+          </TouchableOpacity>
+        )}
+      </View>
+      
+      <TextInput
+        style={styles.input}
+        onChangeText={handleChange(`grupos.${grupoIndex}.exercicios.${exercicioIndex}.nome`)}
+        onBlur={handleBlur(`grupos.${grupoIndex}.exercicios.${exercicioIndex}.nome`)}
+        value={exercicio.nome}
+        placeholder="Nome do exercício"
+        placeholderTextColor={Colors.bordas}
+      />
+
+      <View style={styles.exerciseDetailsRow}>
+        <View style={styles.inputHalf}>
+          <Text style={styles.label}>Séries</Text>
+          <TextInput
+            style={styles.smallInput}
+            onChangeText={handleChange(`grupos.${grupoIndex}.exercicios.${exercicioIndex}.series`)}
+            onBlur={handleBlur(`grupos.${grupoIndex}.exercicios.${exercicioIndex}.series`)}
+            value={exercicio.series}
+            placeholder="Nº"
+            keyboardType="numeric"
+            placeholderTextColor={Colors.bordas}
+          />
+        </View>
+
+        <View style={styles.inputHalf}>
+          <Text style={styles.label}>Repetições</Text>
+          <TextInput
+            style={styles.smallInput}
+            onChangeText={handleChange(`grupos.${grupoIndex}.exercicios.${exercicioIndex}.repeticoes`)}
+            onBlur={handleBlur(`grupos.${grupoIndex}.exercicios.${exercicioIndex}.repeticoes`)}
+            value={exercicio.repeticoes}
+            placeholder="Nº"
+            keyboardType="numeric"
+            placeholderTextColor={Colors.bordas}
+          />
+        </View>
+      </View>
+
+      <View style={styles.exerciseDetailsRow}>
+        <View style={styles.inputHalf}>
+          <Text style={styles.label}>Peso (kg)</Text>
+          <TextInput
+            style={styles.smallInput}
+            onChangeText={handleChange(`grupos.${grupoIndex}.exercicios.${exercicioIndex}.peso`)}
+            onBlur={handleBlur(`grupos.${grupoIndex}.exercicios.${exercicioIndex}.peso`)}
+            value={exercicio.peso}
+            placeholder="0.0"
+            keyboardType="numeric"
+            placeholderTextColor={Colors.bordas}
+          />
+        </View>
+
+        <View style={styles.inputHalf}>
+          <Text style={styles.label}>Descanso (seg)</Text>
+          <TextInput
+            style={styles.smallInput}
+            onChangeText={handleChange(`grupos.${grupoIndex}.exercicios.${exercicioIndex}.descanso`)}
+            onBlur={handleBlur(`grupos.${grupoIndex}.exercicios.${exercicioIndex}.descanso`)}
+            value={exercicio.descanso}
+            placeholder="60"
+            keyboardType="numeric"
+            placeholderTextColor={Colors.bordas}
+          />
+        </View>
+      </View>
+    </View>
+  );
 
   return (
     <View style={styles.container}>
       <SafeAreaView edges={['top']} style={{ flex: 1 }}>
         <View style={styles.header}>
-          <TouchableOpacity onPress={() => navigation.goBack()}>
+          <TouchableOpacity 
+            onPress={() => navigation.goBack()}
+            style={styles.backButton}
+          >
             <Feather name="arrow-left" size={24} color="#fff" />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>Nova Ficha de Treino</Text>
         </View>
 
-        <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+        <ScrollView style={styles.content}>
           <Formik
             initialValues={valoresIniciais}
             validationSchema={fichaTreinoSchema}
-            onSubmit={handleSubmit}
+            onSubmit={async (values) => {
+              console.log('Cheguei')
+              try {
+                console.log('📦 Dados brutos do formulário:', values);
+
+                const nomeFicha = `Ficha ${values.grupos.map(g => g.letra).join(', ')}`; // Exemplo: "Ficha A, B"
+                const nomeTreino = values.grupos[0].nome || `Treino ${values.grupos[0].letra}`;
+                const diasSemana = ['segunda', 'quinta']; // Pode adaptar para um campo no formulário depois
+
+                // Transforma os exercícios da ficha (apenas do primeiro grupo por enquanto)
+                const exercicios = values.grupos[0].exercicios.map((ex, index) => ({
+                  nome: ex.nome,
+                  series: Number(ex.series),
+                  repeticoes: Number(ex.repeticoes),
+                  carga: Number(ex.peso) || 0,
+                  ordem: index + 1,
+                  observacoes: '', // Pode adicionar campo no futuro se quiser
+                }));
+
+                console.log('📤 Dados convertidos para envio:', {
+                  alunoId,
+                  nomeFicha,
+                  nomeTreino,
+                  diasSemana,
+                  exercicios,
+                });
+
+                await criarFichaDeTreino(alunoId, nomeFicha, nomeTreino, diasSemana, exercicios);
+
+                console.log('✅ Ficha criada com sucesso!');
+                navigation.goBack();
+              } catch(error){
+                console.error('❌ Erro ao criar ficha:', error);
+              }
+            }}
           >
             {({
               handleChange,
@@ -102,227 +260,182 @@ export function CreateWorkoutPlan() {
               errors,
               touched,
               setFieldValue
-            }: FormikProps<FichaTreino>) => (
+            }) => (
               <View style={styles.form}>
-                <View style={styles.inputContainer}>
-                  <Text style={styles.label}>Nome do Aluno</Text>
-                  <TextInput
-                    style={[
-                      styles.input,
-                      { backgroundColor: Colors.auxiliar2 }
-                    ]}
-                    value={values.nomeAluno}
-                    editable={false}
-                  />
-                </View>
-
-                <View style={styles.inputContainer}>
-                  <Text style={styles.label}>Objetivo</Text>
-                  <TextInput
-                    style={styles.input}
-                    onChangeText={handleChange('objetivo')}
-                    onBlur={(
-                      e: NativeSyntheticEvent<TextInputFocusEventData>
-                    ) => handleBlur('objetivo')(e)}
-                    value={values.objetivo}
-                    placeholder="Digite o objetivo do treino"
-                    placeholderTextColor={Colors.bordas}
-                    multiline
-                    numberOfLines={3}
-                    textAlignVertical="top"
-                  />
-                  {touched.objetivo && errors.objetivo && (
-                    <Text style={styles.errorText}>{errors.objetivo}</Text>
-                  )}
-                </View>
-
-                <View style={styles.dateContainer}>
-                  <View
-                    style={[styles.inputContainer, { flex: 1, marginRight: 8 }]}
-                  >
-                    <Text style={styles.label}>Data Inicial</Text>
+                <View style={styles.section}>
+                  <Text style={styles.sectionTitle}>Informações Gerais</Text>
+                  
+                  <View style={styles.inputContainer}>
+                    <Text style={styles.label}>Nome do Aluno</Text>
                     <TextInput
-                      style={styles.input}
-                      onChangeText={handleChange('dataInicial')}
-                      onBlur={(
-                        e: NativeSyntheticEvent<TextInputFocusEventData>
-                      ) => handleBlur('dataInicial')(e)}
-                      value={values.dataInicial}
-                      placeholder="DD/MM/AAAA"
-                      placeholderTextColor={Colors.bordas}
+                      style={[styles.input, { backgroundColor: Colors.fundo }]}
+                      value={values.nomeAluno}
+                      editable={false}
                     />
-                    {touched.dataInicial && errors.dataInicial && (
-                      <Text style={styles.errorText}>{errors.dataInicial}</Text>
+                  </View>
+
+                  <View style={styles.inputContainer}>
+                    <Text style={styles.label}>Objetivo</Text>
+                    <TextInput
+                      style={[styles.input, styles.textArea]}
+                      onChangeText={handleChange('objetivo')}
+                      onBlur={handleBlur('objetivo')}
+                      value={values.objetivo}
+                      placeholder="Digite o objetivo do treino"
+                      placeholderTextColor={Colors.bordas}
+                      multiline
+                      numberOfLines={3}
+                      textAlignVertical="top"
+                    />
+                    {touched.objetivo && errors.objetivo && (
+                      <Text style={styles.errorText}>{errors.objetivo}</Text>
                     )}
                   </View>
 
-                  <View
-                    style={[styles.inputContainer, { flex: 1, marginLeft: 8 }]}
-                  >
-                    <Text style={styles.label}>Data Final</Text>
-                    <TextInput
-                      style={styles.input}
-                      onChangeText={handleChange('dataFinal')}
-                      onBlur={(
-                        e: NativeSyntheticEvent<TextInputFocusEventData>
-                      ) => handleBlur('dataFinal')(e)}
-                      value={values.dataFinal}
-                      placeholder="DD/MM/AAAA"
-                      placeholderTextColor={Colors.bordas}
-                    />
-                    {touched.dataFinal && errors.dataFinal && (
-                      <Text style={styles.errorText}>{errors.dataFinal}</Text>
-                    )}
-                  </View>
-                </View>
-
-                <Text style={styles.sectionTitle}>Exercícios</Text>
-                {values.exercicios.map(
-                  (exercicio: Exercicio, index: number) => (
-                    <View key={index} style={styles.exerciseContainer}>
-                      <Text style={styles.exerciseTitle}>
-                        Exercício {index + 1}
-                      </Text>
-
-                      <View style={styles.inputContainer}>
-                        <Text style={styles.label}>Nome do Exercício</Text>
-                        <TextInput
-                          style={styles.input}
-                          onChangeText={handleChange(
-                            `exercicios.${index}.nome`
-                          )}
-                          onBlur={(
-                            e: NativeSyntheticEvent<TextInputFocusEventData>
-                          ) => handleBlur(`exercicios.${index}.nome`)(e)}
-                          value={exercicio.nome}
-                          placeholder="Digite o nome do exercício"
-                          placeholderTextColor={Colors.bordas}
-                        />
-                      </View>
-
-                      <View style={styles.exerciseDetailsContainer}>
-                        <View
-                          style={[
-                            styles.inputContainer,
-                            { flex: 1, marginRight: 8 }
-                          ]}
-                        >
-                          <Text style={styles.label}>Séries</Text>
-                          <TextInput
-                            style={styles.input}
-                            onChangeText={handleChange(
-                              `exercicios.${index}.series`
-                            )}
-                            onBlur={(
-                              e: NativeSyntheticEvent<TextInputFocusEventData>
-                            ) => handleBlur(`exercicios.${index}.series`)(e)}
-                            value={exercicio.series}
-                            placeholder="Nº séries"
-                            placeholderTextColor={Colors.bordas}
-                            keyboardType="numeric"
-                          />
-                        </View>
-
-                        <View
-                          style={[
-                            styles.inputContainer,
-                            { flex: 1, marginLeft: 8 }
-                          ]}
-                        >
-                          <Text style={styles.label}>Repetições</Text>
-                          <TextInput
-                            style={styles.input}
-                            onChangeText={handleChange(
-                              `exercicios.${index}.repeticoes`
-                            )}
-                            onBlur={(
-                              e: NativeSyntheticEvent<TextInputFocusEventData>
-                            ) =>
-                              handleBlur(`exercicios.${index}.repeticoes`)(e)
-                            }
-                            value={exercicio.repeticoes}
-                            placeholder="Nº reps"
-                            placeholderTextColor={Colors.bordas}
-                            keyboardType="numeric"
-                          />
-                        </View>
-                      </View>
-
-                      <View style={styles.exerciseDetailsContainer}>
-                        <View
-                          style={[
-                            styles.inputContainer,
-                            { flex: 1, marginRight: 8 }
-                          ]}
-                        >
-                          <Text style={styles.label}>Peso (kg)</Text>
-                          <TextInput
-                            style={styles.input}
-                            onChangeText={handleChange(
-                              `exercicios.${index}.peso`
-                            )}
-                            onBlur={(
-                              e: NativeSyntheticEvent<TextInputFocusEventData>
-                            ) => handleBlur(`exercicios.${index}.peso`)(e)}
-                            value={exercicio.peso}
-                            placeholder="Peso"
-                            placeholderTextColor={Colors.bordas}
-                            keyboardType="numeric"
-                          />
-                        </View>
-
-                        <View
-                          style={[
-                            styles.inputContainer,
-                            { flex: 1, marginLeft: 8 }
-                          ]}
-                        >
-                          <Text style={styles.label}>Descanso (seg)</Text>
-                          <TextInput
-                            style={styles.input}
-                            onChangeText={handleChange(
-                              `exercicios.${index}.descanso`
-                            )}
-                            onBlur={(
-                              e: NativeSyntheticEvent<TextInputFocusEventData>
-                            ) => handleBlur(`exercicios.${index}.descanso`)(e)}
-                            value={exercicio.descanso}
-                            placeholder="Tempo"
-                            placeholderTextColor={Colors.bordas}
-                            keyboardType="numeric"
-                          />
-                        </View>
-                      </View>
+                  <View style={styles.dateContainer}>
+                    <View style={[styles.inputContainer, { flex: 1, marginRight: 8 }]}>
+                      <Text style={styles.label}>Data Inicial</Text>
+                      <TextInput
+                        style={styles.input}
+                        onChangeText={(valor) => {
+                          const dataFormatada = mascaraData(valor);
+                          setFieldValue('dataInicial', dataFormatada);
+                        }}
+                        onBlur={handleBlur('dataInicial')}
+                        value={values.dataInicial}
+                        placeholder="DD/MM/AAAA"
+                        placeholderTextColor={Colors.bordas}
+                        maxLength={10}
+                        keyboardType="numeric"
+                      />
+                      {touched.dataInicial && errors.dataInicial && (
+                        <Text style={styles.errorText}>{errors.dataInicial}</Text>
+                      )}
                     </View>
-                  )
-                )}
+
+                    <View style={[styles.inputContainer, { flex: 1, marginLeft: 8 }]}>
+                      <Text style={styles.label}>Data Final</Text>
+                      <TextInput
+                        style={styles.input}
+                        onChangeText={(valor) => {
+                          const dataFormatada = mascaraData(valor);
+                          setFieldValue('dataFinal', dataFormatada);
+                        }}
+                        onBlur={handleBlur('dataFinal')}
+                        value={values.dataFinal}
+                        placeholder="DD/MM/AAAA"
+                        placeholderTextColor={Colors.bordas}
+                        maxLength={10}
+                        keyboardType="numeric"
+                      />
+                      {touched.dataFinal && errors.dataFinal && (
+                        <Text style={styles.errorText}>{errors.dataFinal}</Text>
+                      )}
+                    </View>
+                  </View>
+                </View>
+
+                {values.grupos.map((grupo, grupoIndex) => (
+                  <View key={grupoIndex} style={styles.groupSection}>
+                    <View style={styles.groupHeader}>
+                      <Text style={styles.groupTitle}>Grupo {grupo.letra}</Text>
+                      {grupoIndex > 0 && (
+                        <TouchableOpacity
+                          onPress={() => {
+                            const newGroups = values.grupos.filter((_, index) => index !== grupoIndex);
+                            setFieldValue('grupos', newGroups);
+                          }}
+                          style={styles.removeButton}
+                        >
+                          <Feather name="trash-2" size={20} color="#FF6B6B" />
+                        </TouchableOpacity>
+                      )}
+                    </View>
+
+                    <TextInput
+                      style={styles.input}
+                      onChangeText={handleChange(`grupos.${grupoIndex}.nome`)}
+                      onBlur={handleBlur(`grupos.${grupoIndex}.nome`)}
+                      value={grupo.nome}
+                      placeholder="Nome do grupo (ex: Peito e Tríceps)"
+                      placeholderTextColor={Colors.bordas}
+                    />
+
+                    <TextInput
+                      style={styles.input}
+                      onChangeText={handleChange(`grupos.${grupoIndex}.foco`)}
+                      onBlur={handleBlur(`grupos.${grupoIndex}.foco`)}
+                      value={grupo.foco}
+                      placeholder="Foco do treino"
+                      placeholderTextColor={Colors.bordas}
+                    />
+
+                    {grupo.exercicios.map((exercicio, exercicioIndex) =>
+                      renderExercicio(
+                        exercicio,
+                        grupoIndex,
+                        exercicioIndex,
+                        setFieldValue,
+                        handleChange,
+                        handleBlur,
+                        values
+                      )
+                    )}
+
+                    <TouchableOpacity
+                      style={styles.addButton}
+                      onPress={() => {
+                        const novosExercicios = [
+                          ...grupo.exercicios,
+                          {
+                            nome: '',
+                            series: '',
+                            repeticoes: '',
+                            peso: '',
+                            descanso: ''
+                          }
+                        ];
+                        setFieldValue(`grupos.${grupoIndex}.exercicios`, novosExercicios);
+                      }}
+                    >
+                      <Feather name="plus-circle" size={20} color={Colors.primary} />
+                      <Text style={styles.addButtonText}>Adicionar Exercício</Text>
+                    </TouchableOpacity>
+                  </View>
+                ))}
 
                 <TouchableOpacity
-                  style={styles.addButton}
+                  style={styles.addGroupButton}
                   onPress={() => {
-                    const novosExercicios = [
-                      ...values.exercicios,
+                    const novosGrupos = [
+                      ...values.grupos,
                       {
+                        letra: getNextGroupLetter(values.grupos),
                         nome: '',
-                        series: '',
-                        repeticoes: '',
-                        peso: '',
-                        descanso: ''
+                        foco: '',
+                        exercicios: [
+                          {
+                            nome: '',
+                            series: '',
+                            repeticoes: '',
+                            peso: '',
+                            descanso: ''
+                          }
+                        ]
                       }
                     ];
-                    setFieldValue('exercicios', novosExercicios);
+                    setFieldValue('grupos', novosGrupos);
                   }}
                 >
-                  <Text style={styles.addButtonText}>Adicionar Exercício</Text>
+                  <Feather name="plus-circle" size={20} color={Colors.white} />
+                  <Text style={styles.addGroupButtonText}>Adicionar Grupo</Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity
                   style={styles.submitButton}
-                  onPress={() => handleSubmit()}
+                  onPress={() => handleSubmit}
                 >
-                  <Text style={styles.submitButtonText}>
-                    Salvar Ficha de Treino
-                  </Text>
+                  <Text style={styles.submitButtonText}>Salvar Ficha de Treino</Text>
                 </TouchableOpacity>
               </View>
             )}

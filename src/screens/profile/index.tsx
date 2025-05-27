@@ -1,13 +1,15 @@
 /* eslint-disable @typescript-eslint/no-require-imports */
-import React from 'react';
-import { View, Text, Image, TouchableOpacity, ScrollView } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, Image, TouchableOpacity, ScrollView, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Feather } from '@expo/vector-icons';
 
 import Layout from '../../components/layout';
-import { useAuth } from '../../contexts/Auth';
+
 import styles from './style';
+import { auth } from '@/src/config/FirebaseConfig';
+import { userService, Usuario } from '@/src/service/userService';
 
 type MenuItem = {
   icon: keyof typeof Feather.glyphMap;
@@ -15,8 +17,40 @@ type MenuItem = {
   onPress: () => void;
 };
 
-const Perfil = () => {
-  const { signOut, authData } = useAuth();
+const Profile = () => {
+  const [user, setUser] = useState<Usuario | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const getUser = async () => {
+      try {
+        const userData = await userService.getCurrentUser();
+        setUser(userData);
+      } catch (error) {
+        console.error("Error loading profile data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    getUser();
+  }, []);
+
+  if (loading) {
+    return (
+      <View style={styles.container}>
+        <ActivityIndicator size="large" />
+      </View>
+    );
+  }
+
+  if (!user) {
+    return (
+      <View style={styles.container}>
+        <Text>User not found</Text>
+      </View>
+    );
+  }
 
   const stats = [
     { value: '45', label: 'Alunos Ativos' },
@@ -42,6 +76,14 @@ const Perfil = () => {
     }
   ];
 
+  const handleSignOut = async () => {
+    try {
+      await auth.signOut();
+    } catch (error) {
+      console.error("Error signing out:", error);
+    }
+  };
+
   return (
     <Layout>
       <SafeAreaView style={{ flex: 1 }}>
@@ -56,15 +98,15 @@ const Perfil = () => {
                 <Feather name="camera" size={20} color="#FFFFFF" />
               </TouchableOpacity>
             </View>
-            <Text style={styles.userName}>{authData?.name}</Text>
-            <Text style={styles.userEmail}>{authData?.email}</Text>
+            <Text style={styles.userName}>{user.name || 'Name not set'}</Text>
+            <Text style={styles.userEmail}>{user.email}</Text>
             <View style={styles.statusBadge}>
-              <Text style={styles.statusText}>{authData?.userType}</Text>
+              <Text style={styles.statusText}>{user.tipo}</Text>
             </View>
           </View>
 
           <View style={styles.content}>
-            {authData?.userType === 'personal' && (
+            {user.tipo === 'Personal' && (
               <View style={styles.statsContainer}>
                 {stats.map((stat, index) => (
                   <View key={index} style={styles.statItem}>
@@ -103,7 +145,7 @@ const Perfil = () => {
             <View style={styles.menuSection}>
               <TouchableOpacity
                 style={[styles.menuItem, styles.menuItemDanger]}
-                onPress={signOut}
+                onPress={handleSignOut}
               >
                 <View style={styles.menuIcon}>
                   <Feather name="log-out" size={24} color="#FF6B6B" />
@@ -120,4 +162,4 @@ const Perfil = () => {
   );
 };
 
-export default Perfil;
+export default Profile;

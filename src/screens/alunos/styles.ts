@@ -20,14 +20,19 @@ export const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    padding: 16
+    padding: 16,
+    backgroundColor: Colors.fundo
   },
   title: {
     fontSize: 28,
     fontWeight: 'bold',
     color: Colors.white
   },
-  addButton: {
+  headerButtons: {
+    flexDirection: 'row',
+    alignItems: 'center'
+  },
+  headerButton: {
     backgroundColor: Colors.primary,
     width: 48,
     height: 48,
@@ -35,9 +40,29 @@ export const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center'
   },
+  fabButton: {
+    position: 'absolute',
+    right: 16,
+    bottom: 80,
+    backgroundColor: Colors.primary,
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    justifyContent: 'center',
+    alignItems: 'center',
+    elevation: 8,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.30,
+    shadowRadius: 4.65,
+  },
   searchContainer: {
     paddingHorizontal: 16,
-    marginBottom: 16
+    marginBottom: 16,
+    backgroundColor: Colors.fundo
   },
   searchInputContainer: {
     flexDirection: 'row',
@@ -54,13 +79,14 @@ export const styles = StyleSheet.create({
     color: Colors.white
   },
   filtrosContainer: {
-    paddingHorizontal: 16,
-    marginBottom: 16
+    maxHeight: 50,
+    backgroundColor: Colors.fundo
   },
   filtroGrupo: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginRight: 24
+    marginRight: 24,
+    paddingHorizontal: 16
   },
   filtroLabel: {
     color: Colors.white,
@@ -88,7 +114,8 @@ export const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 16,
-    marginBottom: 16
+    marginBottom: 16,
+    backgroundColor: Colors.fundo
   },
   ordenacaoLabel: {
     color: Colors.white,
@@ -113,7 +140,8 @@ export const styles = StyleSheet.create({
     fontWeight: 'bold'
   },
   listaContainer: {
-    padding: 16
+    paddingHorizontal: 16,
+    paddingBottom: 90
   },
   alunoCard: {
     backgroundColor: Colors.auxiliar2,
@@ -207,7 +235,8 @@ export const styles = StyleSheet.create({
   },
   acoesContainer: {
     flexDirection: 'row',
-    justifyContent: 'space-between'
+    justifyContent: 'space-between',
+    marginTop: 16
   },
   acaoButton: {
     flex: 1,
@@ -218,10 +247,15 @@ export const styles = StyleSheet.create({
     borderRadius: 8,
     marginHorizontal: 4
   },
+  acaoButtonText: {
+    color: Colors.white,
+    fontSize: 14,
+    fontWeight: 'bold',
+    marginLeft: 8
+  },
   acaoText: {
     color: Colors.white,
     fontSize: 14,
-    fontWeight: '500',
     marginLeft: 8
   }
 });
