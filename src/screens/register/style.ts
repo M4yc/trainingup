@@ -64,7 +64,7 @@ const styles = StyleSheet.create({
   },
   loginLinkText: {
     color: '#4be381',
-    fontSize: 14
+    fontSize: 16
   },
   personalItem: {
   padding: 12,

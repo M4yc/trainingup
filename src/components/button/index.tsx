@@ -20,6 +20,7 @@ type ButtonProps = {
   width?: DimensionValue;
   height?: DimensionValue;
   style?: ViewStyle;
+  disabled?: boolean;
 };
 
 const Button: React.FC<ButtonProps> = ({
@@ -28,7 +29,8 @@ const Button: React.FC<ButtonProps> = ({
   variant = 'filled',
   width = '100%',
   height = 48,
-  style
+  style,
+  disabled = false
 }) => {
   const isFilled = variant === 'filled';
   return (
@@ -36,10 +38,11 @@ const Button: React.FC<ButtonProps> = ({
       style={[
         styles.button,
         isFilled ? styles.filled : styles.outlined,
-        { width, height },
+        { width, height, opacity: disabled ? 0.5 : 1 }, // opacidade
         style
       ]}
       onPress={onPress}
+      disabled={disabled}
     >
       <Text style={isFilled ? styles.textFilled : styles.textOutlined}>
         {text}

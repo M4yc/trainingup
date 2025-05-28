@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-require-imports */
-import React from 'react';
+import React, { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { View, Text, TextInput, Image, Alert } from 'react-native';
 
@@ -20,6 +20,7 @@ import AppStack from '@/src/routes/AppStack';
 import { getDoc } from 'firebase/firestore';
 import { doc } from 'firebase/firestore';
 import PersonalStack from '@/src/routes/PersonalStack';
+import { Select } from '@/src/components/select';
 
 type FormData = {
   email: string;

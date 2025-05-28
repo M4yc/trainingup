@@ -25,6 +25,8 @@ import { RootStackParamList } from 'src/routes/types';
 import { auth, db } from '../../config/FirebaseConfig';
 
 import styles from './style';
+import { Select } from '@/src/components/select';
+import { Ionicons } from '@expo/vector-icons';
 
 type FormData = {
   name: string;
@@ -109,8 +111,13 @@ const RegisterScreen = () => {
     <Layout>
       <ScrollView contentContainerStyle={styles.container}>
         <View style={styles.content}>
+          {step == 2 &&(<TouchableOpacity onPress={() => setStep(1)} style={{flexDirection: 'row', alignItems: 'center', position: 'absolute', top: 0, left: 0}}>
+            <Ionicons name='chevron-back' color={'#4be381'} size={24}/>
+            <Text style={styles.loginLinkText}>Voltar</Text>
+          </TouchableOpacity>)}
+          
           <Image source={IconApp} style={{ width: 150, height: 150 }} />
-
+          
           <View style={{ width: '100%', gap: 20 }}>
             {step === 1 && (
               <>
@@ -239,43 +246,28 @@ const RegisterScreen = () => {
 
             {step === 2 && userType === 'Aluno' && (
               <>
-                <Text style={{}}>Escolha seu Personal</Text>
-
+                <Text style={{color: '#fff'}}>Escolha seu Personal</Text>
                 {personals.length === 0 ? (
                   <Text style={{ textAlign: 'center', color: '#999' }}>
                     Carregando personais...
                   </Text>
                 ) : (
-                  personals.map((personal) => (
-                    <TouchableOpacity
-                      key={personal.id}
-                      style={[
-                        styles.personalItem,
-                        selectedPersonalId === personal.id && styles.personalItemSelected
-                      ]}
-                      onPress={() => setSelectedPersonalId(personal.id)}
-                    >
-                      <Text
-                        style={{
-                          color: selectedPersonalId === personal.id ? '#fff' : '#333'
-                        }}
-                      >
-                        {personal.name}
-                      </Text>
-                    </TouchableOpacity>
-                  ))
+                  <Select
+                    value={selectedPersonalId ?? ''}
+                    onChange={setSelectedPersonalId}
+                    options={personals.map((personal) => ({
+                      label: personal.name,
+                      value: personal.id
+                    }))}
+                    placeholder="Selecione um personal"
+                  />
                 )}
 
                 <Button
                   text={isLoading ? 'Cadastrando...' : 'Finalizar Cadastro'}
                   onPress={handleSubmit(onSubmit)}
-                  style={{ opacity: isLoading || !selectedPersonalId ? 0.7 : 1 }}
-                  // disabled={!selectedPersonalId || isLoading}
+                  disabled={!selectedPersonalId || isLoading}
                 />
-
-                <TouchableOpacity onPress={() => setStep(1)}>
-                  <Text style={styles.loginLinkText}>Voltar</Text>
-                </TouchableOpacity>
               </>
             )}
 
