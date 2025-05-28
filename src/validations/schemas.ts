@@ -1,5 +1,5 @@
 import * as yup from 'yup';
-
+import { isValidDate,isAfter } from './dateValidations';
 // Esquema de validação para Login
 export const loginSchema = yup.object().shape({
   email: yup
@@ -36,8 +36,21 @@ export const registerSchema = yup.object().shape({
 export const fichaTreinoSchema = yup.object().shape({
   nomeAluno: yup.string().required('Nome do aluno é obrigatório'),
   objetivo: yup.string().required('Objetivo é obrigatório'),
-  dataInicial: yup.string().required('Data inicial é obrigatória'),
-  dataFinal: yup.string().required('Data final é obrigatória'),
+  dataInicial: yup
+    .string()
+    .required('Data inicial é obrigatória')
+    .test('valid-date', 'Data inválida (use DD/MM/AAAA)', (value) => 
+      value ? isValidDate(value) : false
+    ),
+  dataFinal: yup
+    .string()
+    .required('Data final é obrigatória')
+    .test('valid-date', 'Data inválida (use DD/MM/AAAA)', (value) => 
+      value ? isValidDate(value) : false
+    )
+    .test('is-after', 'Data final deve ser depois da data inicial', function(value) {
+      return isAfter(this.parent.dataInicial, value);
+    }),
   grupos: yup.array().of(
     yup.object().shape({
       letra: yup.string().required('Letra do grupo é obrigatória'),

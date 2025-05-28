@@ -15,7 +15,7 @@ import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
 import { createUserWithEmailAndPassword, signOut } from 'firebase/auth';
-import { setDoc, doc, collection, getDocs, query, where } from 'firebase/firestore';
+import { setDoc, doc, collection, getDocs, query, where, getFirestore } from 'firebase/firestore';
 
 import IconApp from '@assets/Icon_app.png';
 import Button from '@components/button';

@@ -1,6 +1,6 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import DashboardPersonal from '@screens/dashboardPersonal';
-import { CreateWorkoutPlan } from '@screens/fichaAluno/createWorkoutPlan';
+import { CreateWorkoutPlan } from '@/src/screens/newFichaAluno/createWorkoutPlan';
 import NovaFichaTreino from '@screens/novaFichaTreino';
 import TreinoDesc from '@screens/treinoDesc';
 

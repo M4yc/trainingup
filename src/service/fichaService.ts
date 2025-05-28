@@ -42,6 +42,8 @@ export async function buscarFichasDoAluno(alunoId: string): Promise<Ficha[]> {
           carga: data.carga,
           ordem: data.ordem,
           observacoes: data.observacoes,
+          descricao: data.descricao,
+          image_url: data.image_url
         };
       });
 

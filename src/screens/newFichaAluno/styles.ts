@@ -73,7 +73,8 @@ export const styles = StyleSheet.create({
     backgroundColor: '#2A2634',
     borderRadius: 12,
     padding: 16,
-    marginBottom: 16
+    marginBottom: 16,
+    gap: 10
   },
   groupHeader: {
     flexDirection: 'row',
@@ -93,7 +94,8 @@ export const styles = StyleSheet.create({
     backgroundColor: Colors.fundo,
     borderRadius: 8,
     padding: 16,
-    marginBottom: 16
+    marginBottom: 16,
+    gap: 10
   },
   exerciseHeader: {
     flexDirection: 'row',

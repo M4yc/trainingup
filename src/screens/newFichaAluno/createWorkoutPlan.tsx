@@ -1,11 +1,10 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
   ScrollView,
   TouchableOpacity,
-  TextInput,
-  StyleSheet
+  TextInput
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Colors from '@constants/colors';
@@ -16,6 +15,10 @@ import { Formik } from 'formik';
 import { fichaTreinoSchema } from '@validations/schemas';
 import { styles } from './styles';
 import { criarFichaDeTreino } from '@/src/service/testService';
+import { Select } from '@/src/components/select';
+import { setDoc, doc, collection, getDocs, query, where, getFirestore } from 'firebase/firestore';
+import { mascaraData } from '@/src/utils/maskUtils';
+import { auth, db } from '../../config/FirebaseConfig';
 
 type RootStackParamList = {
   CreateWorkoutPlan: {
@@ -50,30 +53,18 @@ interface FichaTreino {
   grupos: GrupoTreino[];
 }
 
-const mascaraData = (valor: string) => {
-  // Remove tudo que não for número
-  const apenasNumeros = valor.replace(/\D/g, '');
-  
-  // Aplica a máscara DD/MM/AAAA
-  let dataFormatada = apenasNumeros;
-  if (apenasNumeros.length > 0) {
-    // Adiciona a primeira barra após o dia
-    if (apenasNumeros.length > 2) {
-      dataFormatada = `${apenasNumeros.substring(0, 2)}/${apenasNumeros.substring(2)}`;
-    }
-    // Adiciona a segunda barra após o mês
-    if (apenasNumeros.length > 4) {
-      dataFormatada = `${dataFormatada.substring(0, 5)}/${apenasNumeros.substring(4, 8)}`;
-    }
-  }
-  
-  return dataFormatada;
+type Aluno = {
+  id: string;
+  name: string;  
 };
 
 export function CreateWorkoutPlan() {
   const navigation = useNavigation<NavigationProp>();
   const route = useRoute<RoutePropType>();
   const { alunoNome } = route.params;
+  const [alunos, setAlunos] = useState<Aluno[]>([]);
+  const [selectedAlunoId, setSelectedAlunoId] = useState('');
+
   const alunoId = '33zVVTB7QkRrgwq7YJBQw77kmc62';
 
   const getNextGroupLetter = (currentGroups: GrupoTreino[]) => {
@@ -81,6 +72,35 @@ export function CreateWorkoutPlan() {
     const usedLetters = currentGroups.map(group => group.letra);
     return letters.split('').find(letter => !usedLetters.includes(letter)) || 'A';
   };
+  async function listarAlunosPersonal(personalId: string) {
+    const usuariosRef = collection(db, 'usuarios');
+    const q = query(usuariosRef, 
+      where('tipo', '==', 'Aluno'), 
+      where('personalId', '==', personalId)
+    );
+    try {
+    const snapshot = await getDocs(q);
+    const alunos = snapshot.docs.map(doc => {
+      const data = doc.data();
+      return {
+        id: doc.id,
+        name: data.name,
+      } as Aluno;
+    });
+    return(alunos);
+    } catch (error) {
+      console.error("Erro ao buscar alunos:", error);
+      return [];
+    }
+  }
+  console.log(alunos);
+  useEffect(()=>{
+    const carregarAlunos = async () =>{
+      const resultado = await listarAlunosPersonal('q2nBNmmpoMgBZSuEN2MlnT9PBBM2');
+      setAlunos(resultado);
+    }
+    carregarAlunos();
+  },[]);
 
   const valoresIniciais: FichaTreino = {
     nomeAluno: alunoNome,
@@ -267,10 +287,14 @@ export function CreateWorkoutPlan() {
                   
                   <View style={styles.inputContainer}>
                     <Text style={styles.label}>Nome do Aluno</Text>
-                    <TextInput
-                      style={[styles.input, { backgroundColor: Colors.fundo }]}
-                      value={values.nomeAluno}
-                      editable={false}
+                    <Select
+                      value={selectedAlunoId ?? ''}
+                      onChange={setSelectedAlunoId}
+                      options={alunos.map(aluno => ({
+                        label: aluno.name,
+                        value: aluno.id
+                      }))}
+                      placeholder="Selecione um Aluno"
                     />
                   </View>
 
