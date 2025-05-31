@@ -16,9 +16,10 @@ import { fichaTreinoSchema } from '@validations/schemas';
 import { styles } from './styles';
 import { criarFichaDeTreino } from '@/src/service/testService';
 import { Select } from '@/src/components/select';
-import { setDoc, doc, collection, getDocs, query, where, getFirestore } from 'firebase/firestore';
 import { mascaraData } from '@/src/utils/maskUtils';
-import { auth, db } from '../../config/FirebaseConfig';
+
+import { usePersonalService } from '@/src/database/personalService';
+import { FichaTreinoService } from '@/src/service/fichaTreinoService';
 
 type RootStackParamList = {
   CreateWorkoutPlan: {
@@ -30,95 +31,106 @@ type RootStackParamList = {
 type NavigationProp = NativeStackNavigationProp<RootStackParamList, 'CreateWorkoutPlan'>;
 type RoutePropType = RouteProp<RootStackParamList, 'CreateWorkoutPlan'>;
 
-interface Exercicio {
-  nome: string;
-  series: string;
-  repeticoes: string;
-  peso: string;
-  descanso: string;
+interface FichaTreino {
+  id?: number;
+  aluno_id: number;
+  personal_id: number;
+  data_inicio: string;
+  data_fim: string;
+  grupos: GrupoTreino[];
 }
 
 interface GrupoTreino {
-  letra: string;
+  id?: number;
+  ficha_id: number;
   nome: string;
   foco: string;
   exercicios: Exercicio[];
 }
 
-interface FichaTreino {
-  nomeAluno: string;
-  objetivo: string;
-  dataInicial: string;
-  dataFinal: string;
-  grupos: GrupoTreino[];
+interface Exercicio {
+  id?: number;
+  grupo_id: number;
+  nome: string;
+  series: number;
+  repeticoes: number;
+  intervalo: string;
+  peso: number;
+  descricao?: string;
+  imagem?: string;
+}
+
+interface FichaTreinoInput {
+  aluno_id: number;
+  personal_id: number;
+  data_inicio: string;
+  data_fim: string;
+}
+
+interface GrupoTreinoInput {
+  ficha_id: number;
+  nome: string;
+  foco: string;
+}
+
+interface ExercicioInput {
+  grupo_id: number;
+  nome: string;
+  series: number;
+  repeticoes: number;
+  intervalo: string;
+  peso: number;
+  descricao?: string;
+  imagem?: string;
 }
 
 type Aluno = {
-  id: string;
+  id: number;
   name: string;  
 };
 
 export function CreateWorkoutPlan() {
   const navigation = useNavigation<NavigationProp>();
   const route = useRoute<RoutePropType>();
-  const { alunoNome } = route.params;
   const [alunos, setAlunos] = useState<Aluno[]>([]);
   const [selectedAlunoId, setSelectedAlunoId] = useState('');
+  const personalService = usePersonalService();
+  const fichaTreinoService = FichaTreinoService();
 
-  const alunoId = '33zVVTB7QkRrgwq7YJBQw77kmc62';
-
-  const getNextGroupLetter = (currentGroups: GrupoTreino[]) => {
-    const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-    const usedLetters = currentGroups.map(group => group.letra);
-    return letters.split('').find(letter => !usedLetters.includes(letter)) || 'A';
-  };
-  async function listarAlunosPersonal(personalId: string) {
-    const usuariosRef = collection(db, 'usuarios');
-    const q = query(usuariosRef, 
-      where('tipo', '==', 'Aluno'), 
-      where('personalId', '==', personalId)
-    );
-    try {
-    const snapshot = await getDocs(q);
-    const alunos = snapshot.docs.map(doc => {
-      const data = doc.data();
-      return {
-        id: doc.id,
-        name: data.name,
-      } as Aluno;
-    });
-    return(alunos);
-    } catch (error) {
-      console.error("Erro ao buscar alunos:", error);
-      return [];
-    }
-  }
-  console.log(alunos);
-  useEffect(()=>{
-    const carregarAlunos = async () =>{
-      const resultado = await listarAlunosPersonal('q2nBNmmpoMgBZSuEN2MlnT9PBBM2');
-      setAlunos(resultado);
-    }
-    carregarAlunos();
-  },[]);
-
+  useEffect(() => {
+    const setup = async () => {
+      try {
+        const alunos= await personalService.getAlunosPersonal(1);
+        setAlunos(alunos);
+      }catch(error){
+        console.log(error)
+      }
+    };
+  
+    setup();
+  }, []);
+  console.log('Alunos: ', alunos);
   const valoresIniciais: FichaTreino = {
-    nomeAluno: alunoNome,
-    objetivo: '',
-    dataInicial: '',
-    dataFinal: '',
+    id: 0,
+    aluno_id: 0,
+    personal_id: 0,
+    data_inicio: '',
+    data_fim: '',
     grupos: [
       {
-        letra: 'A',
+        id: 0,
+        ficha_id: 0,
         nome: '',
         foco: '',
         exercicios: [
           {
+            id: 0,
+            grupo_id: 0,
             nome: '',
-            series: '',
-            repeticoes: '',
-            peso: '',
-            descanso: ''
+            series: 0,
+            repeticoes: 0,
+            peso: 0,
+            intervalo: ''
           }
         ]
       }
@@ -161,14 +173,26 @@ export function CreateWorkoutPlan() {
         placeholderTextColor={Colors.bordas}
       />
 
+      <TextInput
+        style={styles.input}
+        onChangeText={handleChange(`grupos.${grupoIndex}.exercicios.${exercicioIndex}.descricao`)}
+        onBlur={handleBlur(`grupos.${grupoIndex}.exercicios.${exercicioIndex}.descricao`)}
+        value={exercicio.descricao}
+        placeholder="Descrição do exercício"
+        placeholderTextColor={Colors.bordas}
+      />
+
       <View style={styles.exerciseDetailsRow}>
         <View style={styles.inputHalf}>
           <Text style={styles.label}>Séries</Text>
           <TextInput
             style={styles.smallInput}
-            onChangeText={handleChange(`grupos.${grupoIndex}.exercicios.${exercicioIndex}.series`)}
+            onChangeText={(valor) => {
+              const numero = valor.replace(/\D/g, '');
+              setFieldValue(`grupos.${grupoIndex}.exercicios.${exercicioIndex}.series`, numero ? parseInt(numero) : '');
+            }}
             onBlur={handleBlur(`grupos.${grupoIndex}.exercicios.${exercicioIndex}.series`)}
-            value={exercicio.series}
+            value={exercicio.series ? exercicio.series.toString() : ''}
             placeholder="Nº"
             keyboardType="numeric"
             placeholderTextColor={Colors.bordas}
@@ -179,9 +203,12 @@ export function CreateWorkoutPlan() {
           <Text style={styles.label}>Repetições</Text>
           <TextInput
             style={styles.smallInput}
-            onChangeText={handleChange(`grupos.${grupoIndex}.exercicios.${exercicioIndex}.repeticoes`)}
+            onChangeText={(valor) => {
+              const numero = valor.replace(/\D/g, '');
+              setFieldValue(`grupos.${grupoIndex}.exercicios.${exercicioIndex}.repeticoes`, numero ? parseInt(numero) : '');
+            }}
             onBlur={handleBlur(`grupos.${grupoIndex}.exercicios.${exercicioIndex}.repeticoes`)}
-            value={exercicio.repeticoes}
+            value={exercicio.repeticoes ? exercicio.repeticoes.toString() : ''}
             placeholder="Nº"
             keyboardType="numeric"
             placeholderTextColor={Colors.bordas}
@@ -194,22 +221,28 @@ export function CreateWorkoutPlan() {
           <Text style={styles.label}>Peso (kg)</Text>
           <TextInput
             style={styles.smallInput}
-            onChangeText={handleChange(`grupos.${grupoIndex}.exercicios.${exercicioIndex}.peso`)}
+            onChangeText={(valor) => {
+              const numero = valor.replace(/\D/g, '');
+              setFieldValue(`grupos.${grupoIndex}.exercicios.${exercicioIndex}.peso`, numero ? parseInt(numero) : '');
+            }}
             onBlur={handleBlur(`grupos.${grupoIndex}.exercicios.${exercicioIndex}.peso`)}
-            value={exercicio.peso}
-            placeholder="0.0"
+            value={exercicio.peso ? exercicio.peso.toString() : ''}
+            placeholder="0"
             keyboardType="numeric"
             placeholderTextColor={Colors.bordas}
           />
         </View>
 
         <View style={styles.inputHalf}>
-          <Text style={styles.label}>Descanso (seg)</Text>
+          <Text style={styles.label}>Intervalo (seg)</Text>
           <TextInput
             style={styles.smallInput}
-            onChangeText={handleChange(`grupos.${grupoIndex}.exercicios.${exercicioIndex}.descanso`)}
-            onBlur={handleBlur(`grupos.${grupoIndex}.exercicios.${exercicioIndex}.descanso`)}
-            value={exercicio.descanso}
+            onChangeText={(valor) => {
+              const numero = valor.replace(/\D/g, '');
+              setFieldValue(`grupos.${grupoIndex}.exercicios.${exercicioIndex}.intervalo`, numero);
+            }}
+            onBlur={handleBlur(`grupos.${grupoIndex}.exercicios.${exercicioIndex}.intervalo`)}
+            value={exercicio.intervalo}
             placeholder="60"
             keyboardType="numeric"
             placeholderTextColor={Colors.bordas}
@@ -218,6 +251,95 @@ export function CreateWorkoutPlan() {
       </View>
     </View>
   );
+  const salvarFicha = async (values: FichaTreino) => {
+    console.log('Iniciando salvarFicha...');
+    try {
+      // 1. Criar a ficha de treino
+      const fichaInput: FichaTreinoInput = {
+        aluno_id: Number(selectedAlunoId),
+        personal_id: 1, // Você pode ajustar isso conforme necessário
+        data_inicio: values.data_inicio,
+        data_fim: values.data_fim
+      };
+
+      console.log('Dados da ficha:', fichaInput);
+      const fichaId = await fichaTreinoService.inserirFichaTreino(fichaInput);
+      console.log('ID da ficha criada:', fichaId);
+      
+      if (fichaId) {
+        // 2. Inserir os grupos
+        for (const grupo of values.grupos) {
+          const grupoInput: GrupoTreinoInput = {
+            ficha_id: fichaId,
+            nome: grupo.nome,
+            foco: grupo.foco
+          };
+
+          console.log('Dados do grupo:', grupoInput);
+          const grupoId = await fichaTreinoService.inserirGrupo(grupoInput);
+          console.log('ID do grupo criado:', grupoId);
+        
+          if (grupoId) {
+            // 3. Inserir os exercícios do grupo
+            for (const exercicio of grupo.exercicios) {
+              const exercicioInput: ExercicioInput = {
+                grupo_id: grupoId,
+                nome: exercicio.nome,
+                series: Number(exercicio.series),
+                repeticoes: Number(exercicio.repeticoes),
+                intervalo: exercicio.intervalo,
+                peso: Number(exercicio.peso),
+                descricao: exercicio.descricao,
+                imagem: exercicio.imagem
+              };
+
+              console.log('Dados do exercício:', exercicioInput);
+              const exercicioId = await fichaTreinoService.inserirExercicio(exercicioInput);
+              console.log('ID do exercício criado:', exercicioId);
+            }
+          }
+        }
+        return true;
+      }
+      return false;
+    } catch (error) {
+      console.error('Erro ao salvar ficha:', error);
+      return false;
+    }
+  }
+  const verFicha = async () => {
+    const fichas = await fichaTreinoService.getFichaCompleta(1);
+    console.log('Fichas: ', fichas);
+  }
+
+  const formatarErro = (key: string, error: any): string => {
+    if (typeof error === 'string') {
+      return error;
+    }
+    
+    if (Array.isArray(error)) {
+      return error.map(e => formatarErro(key, e)).join(', ');
+    }
+    
+    if (typeof error === 'object' && error !== null) {
+      return Object.entries(error)
+        .map(([subKey, subError]) => {
+          const campo = subKey === 'nome' ? 'Nome' :
+                       subKey === 'foco' ? 'Foco' :
+                       subKey === 'exercicios' ? 'Exercícios' :
+                       subKey === 'series' ? 'Séries' :
+                       subKey === 'repeticoes' ? 'Repetições' :
+                       subKey === 'peso' ? 'Peso' :
+                       subKey === 'intervalo' ? 'Intervalo' :
+                       subKey;
+          
+          return `${campo}: ${formatarErro(subKey, subError)}`;
+        })
+        .join(', ');
+    }
+    
+    return String(error);
+  };
 
   return (
     <View style={styles.container}>
@@ -236,50 +358,45 @@ export function CreateWorkoutPlan() {
           <Formik
             initialValues={valoresIniciais}
             validationSchema={fichaTreinoSchema}
-            onSubmit={async (values) => {
-              console.log('Cheguei')
-              try {
-                console.log('📦 Dados brutos do formulário:', values);
+            onSubmit={
+              async (values, { setSubmitting }) => {
+                console.log('Iniciando salvamento da ficha...');
+                console.log('Valores do formulário:', values);
+                console.log('Aluno selecionado:', selectedAlunoId);
+                
+                try {
+                  if (!selectedAlunoId) {
+                    console.error('❌ Nenhum aluno selecionado');
+                    return;
+                  }
 
-                const nomeFicha = `Ficha ${values.grupos.map(g => g.letra).join(', ')}`; // Exemplo: "Ficha A, B"
-                const nomeTreino = values.grupos[0].nome || `Treino ${values.grupos[0].letra}`;
-                const diasSemana = ['segunda', 'quinta']; // Pode adaptar para um campo no formulário depois
-
-                // Transforma os exercícios da ficha (apenas do primeiro grupo por enquanto)
-                const exercicios = values.grupos[0].exercicios.map((ex, index) => ({
-                  nome: ex.nome,
-                  series: Number(ex.series),
-                  repeticoes: Number(ex.repeticoes),
-                  carga: Number(ex.peso) || 0,
-                  ordem: index + 1,
-                  observacoes: '', // Pode adicionar campo no futuro se quiser
-                }));
-
-                console.log('📤 Dados convertidos para envio:', {
-                  alunoId,
-                  nomeFicha,
-                  nomeTreino,
-                  diasSemana,
-                  exercicios,
-                });
-
-                await criarFichaDeTreino(alunoId, nomeFicha, nomeTreino, diasSemana, exercicios);
-
-                console.log('✅ Ficha criada com sucesso!');
-                navigation.goBack();
-              } catch(error){
-                console.error('❌ Erro ao criar ficha:', error);
+                  const sucesso = await salvarFicha(values);
+                  console.log('Resultado do salvamento:', sucesso);
+                  
+                  if (sucesso) {
+                    console.log('✅ Ficha criada com sucesso!');
+                    navigation.goBack();
+                  } else {
+                    console.error('❌ Erro ao criar ficha');
+                  }
+                } catch(error) {
+                  console.error('❌ Erro ao criar ficha:', error);
+                } finally {
+                  setSubmitting(false);
+                }
               }
-            }}
+            }
           >
             {({
               handleChange,
               handleBlur,
               handleSubmit,
+              isSubmitting,
               values,
               errors,
               touched,
-              setFieldValue
+              setFieldValue,
+              validateForm
             }) => (
               <View style={styles.form}>
                 <View style={styles.section}>
@@ -292,28 +409,10 @@ export function CreateWorkoutPlan() {
                       onChange={setSelectedAlunoId}
                       options={alunos.map(aluno => ({
                         label: aluno.name,
-                        value: aluno.id
+                        value: aluno.id.toString()
                       }))}
                       placeholder="Selecione um Aluno"
                     />
-                  </View>
-
-                  <View style={styles.inputContainer}>
-                    <Text style={styles.label}>Objetivo</Text>
-                    <TextInput
-                      style={[styles.input, styles.textArea]}
-                      onChangeText={handleChange('objetivo')}
-                      onBlur={handleBlur('objetivo')}
-                      value={values.objetivo}
-                      placeholder="Digite o objetivo do treino"
-                      placeholderTextColor={Colors.bordas}
-                      multiline
-                      numberOfLines={3}
-                      textAlignVertical="top"
-                    />
-                    {touched.objetivo && errors.objetivo && (
-                      <Text style={styles.errorText}>{errors.objetivo}</Text>
-                    )}
                   </View>
 
                   <View style={styles.dateContainer}>
@@ -323,17 +422,17 @@ export function CreateWorkoutPlan() {
                         style={styles.input}
                         onChangeText={(valor) => {
                           const dataFormatada = mascaraData(valor);
-                          setFieldValue('dataInicial', dataFormatada);
+                          setFieldValue('data_inicio', dataFormatada);
                         }}
-                        onBlur={handleBlur('dataInicial')}
-                        value={values.dataInicial}
+                        onBlur={handleBlur('data_inicio')}
+                        value={values.data_inicio}
                         placeholder="DD/MM/AAAA"
                         placeholderTextColor={Colors.bordas}
                         maxLength={10}
                         keyboardType="numeric"
                       />
-                      {touched.dataInicial && errors.dataInicial && (
-                        <Text style={styles.errorText}>{errors.dataInicial}</Text>
+                      {touched.data_inicio && errors.data_inicio && (
+                        <Text style={styles.errorText}>{errors.data_inicio}</Text>
                       )}
                     </View>
 
@@ -343,17 +442,17 @@ export function CreateWorkoutPlan() {
                         style={styles.input}
                         onChangeText={(valor) => {
                           const dataFormatada = mascaraData(valor);
-                          setFieldValue('dataFinal', dataFormatada);
+                          setFieldValue('data_fim', dataFormatada);
                         }}
-                        onBlur={handleBlur('dataFinal')}
-                        value={values.dataFinal}
+                        onBlur={handleBlur('data_fim')}
+                        value={values.data_fim}
                         placeholder="DD/MM/AAAA"
                         placeholderTextColor={Colors.bordas}
                         maxLength={10}
                         keyboardType="numeric"
                       />
-                      {touched.dataFinal && errors.dataFinal && (
-                        <Text style={styles.errorText}>{errors.dataFinal}</Text>
+                      {touched.data_fim && errors.data_fim && (
+                        <Text style={styles.errorText}>{errors.data_fim}</Text>
                       )}
                     </View>
                   </View>
@@ -362,7 +461,7 @@ export function CreateWorkoutPlan() {
                 {values.grupos.map((grupo, grupoIndex) => (
                   <View key={grupoIndex} style={styles.groupSection}>
                     <View style={styles.groupHeader}>
-                      <Text style={styles.groupTitle}>Grupo {grupo.letra}</Text>
+                      
                       {grupoIndex > 0 && (
                         <TouchableOpacity
                           onPress={() => {
@@ -413,10 +512,10 @@ export function CreateWorkoutPlan() {
                           ...grupo.exercicios,
                           {
                             nome: '',
-                            series: '',
-                            repeticoes: '',
-                            peso: '',
-                            descanso: ''
+                            series: 0,
+                            repeticoes: 0,
+                            peso: 0,
+                            intervalo: ''
                           }
                         ];
                         setFieldValue(`grupos.${grupoIndex}.exercicios`, novosExercicios);
@@ -434,16 +533,16 @@ export function CreateWorkoutPlan() {
                     const novosGrupos = [
                       ...values.grupos,
                       {
-                        letra: getNextGroupLetter(values.grupos),
+                        letra: 'A',
                         nome: '',
                         foco: '',
                         exercicios: [
                           {
                             nome: '',
-                            series: '',
-                            repeticoes: '',
-                            peso: '',
-                            descanso: ''
+                            series: 0,
+                            repeticoes: 0,
+                            peso: 0,
+                            intervalo: ''
                           }
                         ]
                       }
@@ -457,10 +556,34 @@ export function CreateWorkoutPlan() {
 
                 <TouchableOpacity
                   style={styles.submitButton}
-                  onPress={() => handleSubmit}
+                  onPress={async () => {
+                    console.log('Botão de submit pressionado');
+                    const validationErrors = await validateForm();
+                    console.log('Erros de validação:', validationErrors);
+                    
+                    if (Object.keys(validationErrors).length === 0) {
+                      handleSubmit();
+                    } else {
+                      console.log('Formulário com erros:', validationErrors);
+                    }
+                  }}
+                  disabled={isSubmitting}
                 >
-                  <Text style={styles.submitButtonText}>Salvar Ficha de Treino</Text>
+                  <Text style={styles.submitButtonText}>
+                    {isSubmitting ? 'Salvando...' : 'Salvar Ficha de Treino'}
+                  </Text>
                 </TouchableOpacity>
+
+                {/* Mostrar erros de validação */}
+                {Object.keys(errors).length > 0 && (
+                  <View style={styles.errorContainer}>
+                    {Object.entries(errors).map(([key, error]) => (
+                      <Text key={key} style={styles.errorText}>
+                        {formatarErro(key, error)}
+                      </Text>
+                    ))}
+                  </View>
+                )}
               </View>
             )}
           </Formik>

@@ -64,10 +64,16 @@ export const styles = StyleSheet.create({
     flexDirection: 'row',
     marginTop: 16
   },
+  errorContainer: {
+    marginTop: 10,
+    padding: 10,
+    backgroundColor: '#ffebee',
+    borderRadius: 5,
+  },
   errorText: {
-    color: "#FF6B6B",
-    fontSize: 12,
-    marginTop: 4
+    color: '#d32f2f',
+    fontSize: 14,
+    marginBottom: 5,
   },
   groupSection: {
     backgroundColor: '#2A2634',

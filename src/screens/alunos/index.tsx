@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -15,6 +15,9 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
 import Colors from '@constants/colors';
 import { styles } from './styles';
+import { FichaTreinoService } from '@/src/service/fichaTreinoService';
+import { usePersonalService } from '@/src/database/personalService';
+import { useIsFocused } from '@react-navigation/native';
 
 type RootStackParamList = {
   ListaAlunos: undefined;
@@ -30,86 +33,71 @@ type NavigationProp = NativeStackNavigationProp<
   'ListaAlunos'
 >;
 
-interface Aluno {
-  id: string;
-  nome: string;
-  idade: number;
-  objetivo: string;
-  status: 'Ativo' | 'Inativo' | 'Pendente';
-  ultimoTreino: string;
-  proximoTreino: string;
-  frequencia: string;
-}
+type Aluno = {
+  id: number;
+  name: string;  
+};
 
 const alunosExemplo: Aluno[] = [
   {
-    id: '1',
-    nome: 'João Silva',
-    idade: 28,
-    objetivo: 'Hipertrofia',
-    status: 'Ativo',
-    ultimoTreino: '13/03/2024',
-    proximoTreino: '15/03/2024',
-    frequencia: '3x',
-    
+    id: 1,
+    name: 'João Silva',
   },
   {
-    id: '2',
-    nome: 'Maria Santos',
-    idade: 32,
-    objetivo: 'Emagrecimento',
-    status: 'Ativo',
-    ultimoTreino: '12/03/2024',
-    proximoTreino: '14/03/2024',
-    frequencia: '5x',
-  
+    id: 2,
+    name: 'Maria Santos',
   }
 ];
-
-const filtrosStatus = ['Todos', 'Ativo', 'Inativo', 'Pendente'];
-const filtrosFrequencia = ['Todos', '3x', '5x', '6x'];
 
 export default function AlunosScreen() {
   const navigation = useNavigation<NavigationProp>();
   const [busca, setBusca] = useState('');
-  const [statusSelecionado, setStatusSelecionado] = useState('Todos');
-  const [frequenciaSelecionada, setFrequenciaSelecionada] = useState('Todos');
   const [ordenacao, setOrdenacao] = useState('nome');
+  const [alunos, setAlunos] = useState<Aluno[]>([]);
+  const personalService = usePersonalService();
+  const fichaTreinoService = FichaTreinoService();
+  const isFocused = useIsFocused();
 
+  useEffect(() => {
+    const setup = async () => {
+      const fichas = await fichaTreinoService.getFichasByPersonal(1);
+      console.log('Fichas: ', fichas);
+    };
+    if (isFocused) {
+      setup();
+    }
+  }, [isFocused]);
+
+  useEffect(() => {
+    const setup = async () => {
+      try {
+        const alunos= await personalService.getAlunosPersonal(1);
+        setAlunos(alunos);
+      }catch(error){
+        console.log(error)
+      }
+    };
+  
+    setup();
+  }, []);
+  console.log('Alunos: ', alunos);
+  
   const filtrarAlunos = () => {
-    let alunosFiltrados = [...alunosExemplo];
+    let alunosFiltrados = [...alunos];
 
     // Filtro por busca
     if (busca) {
       alunosFiltrados = alunosFiltrados.filter((aluno) =>
-        aluno.nome.toLowerCase().includes(busca.toLowerCase())
-      );
-    }
-
-    // Filtro por status
-    if (statusSelecionado !== 'Todos') {
-      alunosFiltrados = alunosFiltrados.filter(
-        (aluno) => aluno.status === statusSelecionado
-      );
-    }
-
-    // Filtro por frequência
-    if (frequenciaSelecionada !== 'Todos') {
-      alunosFiltrados = alunosFiltrados.filter(
-        (aluno) => aluno.frequencia.includes(frequenciaSelecionada)
+        aluno.name.toLowerCase().includes(busca.toLowerCase())
       );
     }
 
     // Ordenação
-    alunosFiltrados.sort((a, b) => {
+    alunosFiltrados.sort((a: Aluno, b: Aluno) => {
       if (ordenacao === 'nome') {
-        return a.nome.localeCompare(b.nome);
-      } else {
-        return (
-          new Date(a.proximoTreino).getTime() -
-          new Date(b.proximoTreino).getTime()
-        );
+        return a.name.localeCompare(b.name);
       }
+      return 0;
     });
 
     return alunosFiltrados;
@@ -119,45 +107,7 @@ export default function AlunosScreen() {
     <TouchableOpacity style={styles.alunoCard}>
       <View style={styles.alunoHeader}>
         <View>
-          <Text style={styles.alunoNome}>{item.nome}</Text>
-          <Text style={styles.alunoIdade}>{item.idade} anos</Text>
-        </View>
-        <View
-          style={[
-            styles.statusBadge,
-            {
-              backgroundColor:
-                item.status === 'Ativo'
-                  ? '#44BF86'
-                  : item.status === 'Inativo'
-                    ? '#FF6B6B'
-                    : '#FFA500'
-            }
-          ]}
-        >
-          <Text style={styles.statusText}>{item.status}</Text>
-        </View>
-      </View>
-
-      <View style={styles.alunoInfo}>
-        <View style={styles.infoItem}>
-          <Feather name="target" size={16} color="#00908E" />
-          <Text style={styles.infoText}>Objetivo: {item.objetivo}</Text>
-        </View>
-        <View style={styles.infoItem}>
-          <Feather name="calendar" size={16} color="#44BF86" />
-          <Text style={styles.infoText}>Frequência: {item.frequencia}</Text>
-        </View>
-      </View>
-
-      <View style={styles.treinosContainer}>
-        <View style={styles.treinoInfo}>
-          <Feather name="clock" size={16} color="#00908E" />
-          <Text style={styles.treinoTexto}>Último: {item.ultimoTreino}</Text>
-        </View>
-        <View style={styles.treinoInfo}>
-          <Feather name="calendar" size={16} color="#44BF86" />
-          <Text style={styles.treinoTexto}>Próximo: {item.proximoTreino}</Text>
+          <Text style={styles.alunoNome}>{item.name}</Text>
         </View>
       </View>
 
@@ -166,8 +116,8 @@ export default function AlunosScreen() {
           style={[styles.acaoButton, { backgroundColor: '#44BF86' }]}
           onPress={() =>
             navigation.navigate('CreateWorkoutPlan', {
-              alunoId: item.id,
-              alunoNome: item.nome
+              alunoId: item.id.toString(),
+              alunoNome: item.name
             })
           }
         >
@@ -195,14 +145,7 @@ export default function AlunosScreen() {
       <SafeAreaView edges={['top']} style={{ flex: 1 }}>
         <View style={styles.header}>
           <Text style={styles.title}>Meus Alunos</Text>
-          <View style={styles.headerButtons}>
-            <TouchableOpacity
-              style={[styles.headerButton, { marginRight: 8 }]}
-              onPress={() => navigation.navigate('NovoAluno')}
-            >
-              <Feather name="user-plus" size={24} color="#FFFFFF" />
-            </TouchableOpacity>
-          </View>
+          
         </View>
 
         <View style={styles.searchContainer}>
@@ -217,60 +160,6 @@ export default function AlunosScreen() {
             />
           </View>
         </View>
-
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          style={styles.filtrosContainer}
-        >
-          <View style={styles.filtroGrupo}>
-            <Text style={styles.filtroLabel}>Status:</Text>
-            {filtrosStatus.map((status) => (
-              <TouchableOpacity
-                key={status}
-                style={[
-                  styles.filtroButton,
-                  statusSelecionado === status && styles.filtroButtonAtivo
-                ]}
-                onPress={() => setStatusSelecionado(status)}
-              >
-                <Text
-                  style={[
-                    styles.filtroButtonText,
-                    statusSelecionado === status &&
-                      styles.filtroButtonTextoAtivo
-                  ]}
-                >
-                  {status}
-                </Text>
-              </TouchableOpacity>
-            ))}
-          </View>
-
-          <View style={styles.filtroGrupo}>
-            <Text style={styles.filtroLabel}>Frequência:</Text>
-            {filtrosFrequencia.map((freq) => (
-              <TouchableOpacity
-                key={freq}
-                style={[
-                  styles.filtroButton,
-                  frequenciaSelecionada === freq && styles.filtroButtonAtivo
-                ]}
-                onPress={() => setFrequenciaSelecionada(freq)}
-              >
-                <Text
-                  style={[
-                    styles.filtroButtonText,
-                    frequenciaSelecionada === freq &&
-                      styles.filtroButtonTextoAtivo
-                  ]}
-                >
-                  {freq}
-                </Text>
-              </TouchableOpacity>
-            ))}
-          </View>
-        </ScrollView>
 
         <View style={styles.ordenacaoContainer}>
           <Text style={styles.ordenacaoLabel}>Ordenar por:</Text>
@@ -290,29 +179,12 @@ export default function AlunosScreen() {
               Nome
             </Text>
           </TouchableOpacity>
-          <TouchableOpacity
-            style={[
-              styles.ordenacaoButton,
-              ordenacao === 'proximoTreino' && styles.ordenacaoButtonAtivo
-            ]}
-            onPress={() => setOrdenacao('proximoTreino')}
-          >
-            <Text
-              style={[
-                styles.ordenacaoButtonText,
-                ordenacao === 'proximoTreino' &&
-                  styles.ordenacaoButtonTextoAtivo
-              ]}
-            >
-              Próximo Treino
-            </Text>
-          </TouchableOpacity>
         </View>
 
         <FlatList
           data={filtrarAlunos()}
           renderItem={renderAluno}
-          keyExtractor={(item) => item.id}
+          keyExtractor={(item) => item.id.toString()}
           contentContainerStyle={styles.listaContainer}
           showsVerticalScrollIndicator={false}
           style={{ flex: 1 }}

@@ -28,39 +28,60 @@ export const registerSchema = yup.object({
 
 // Esquema de validação para Ficha de Treino
 export const fichaTreinoSchema = yup.object().shape({
-  nomeAluno: yup.string().required('Nome do aluno é obrigatório'),
-  objetivo: yup.string().required('Objetivo é obrigatório'),
-  dataInicial: yup
+  data_inicio: yup
     .string()
     .required('Data inicial é obrigatória')
     .test('valid-date', 'Data inválida (use DD/MM/AAAA)', (value) => 
       value ? isValidDate(value) : false
-    ),
-  dataFinal: yup
+    )
+    .test('not-past', 'A data inicial não pode ser no passado', (value) => {
+      if (!value) return false;
+      const [day, month, year] = value.split('/').map(Number);
+      const date = new Date(year, month - 1, day);
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      return date >= today;
+    }),
+  data_fim: yup
     .string()
     .required('Data final é obrigatória')
     .test('valid-date', 'Data inválida (use DD/MM/AAAA)', (value) => 
       value ? isValidDate(value) : false
     )
     .test('is-after', 'Data final deve ser depois da data inicial', function(value) {
-      return isAfter(this.parent.dataInicial, value);
+      if (!value || !this.parent.data_inicio) return false;
+      const [dayInicio, monthInicio, yearInicio] = this.parent.data_inicio.split('/').map(Number);
+      const [dayFim, monthFim, yearFim] = value.split('/').map(Number);
+      const dateInicio = new Date(yearInicio, monthInicio - 1, dayInicio);
+      const dateFim = new Date(yearFim, monthFim - 1, dayFim);
+      return dateFim > dateInicio;
     }),
   grupos: yup.array().of(
     yup.object().shape({
-      letra: yup.string().required('Letra do grupo é obrigatória'),
       nome: yup.string().required('Nome do grupo é obrigatório'),
       foco: yup.string().required('Foco do grupo é obrigatório'),
       exercicios: yup.array().of(
         yup.object().shape({
           nome: yup.string().required('Nome do exercício é obrigatório'),
-          series: yup.string().required('Número de séries é obrigatório'),
-          repeticoes: yup.string().required('Número de repetições é obrigatório'),
-          peso: yup.string().required('Peso é obrigatório'),
-          descanso: yup.string().required('Tempo de descanso é obrigatório')
+          series: yup.number()
+            .typeError('Séries deve ser um número')
+            .min(1, 'Mínimo de 1 série')
+            .required('Número de séries é obrigatório'),
+          repeticoes: yup.number()
+            .typeError('Repetições deve ser um número')
+            .min(1, 'Mínimo de 1 repetição')
+            .required('Número de repetições é obrigatório'),
+          peso: yup.number()
+            .typeError('Peso deve ser um número')
+            .min(0, 'Peso não pode ser negativo')
+            .required('Peso é obrigatório'),
+          intervalo: yup.string()
+            .matches(/^\d+$/, 'Intervalo deve ser um número')
+            .required('Intervalo é obrigatório')
         })
-      )
+      ).min(1, 'Adicione pelo menos um exercício')
     })
-  )
+  ).min(1, 'Adicione pelo menos um grupo')
 });
 
 // Esquema de validação para Edição de Perfil
