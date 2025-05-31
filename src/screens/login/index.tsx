@@ -57,12 +57,12 @@ const LoginScreen = () => {
         if (user.tipo === "Personal") {
           navigation.reset({
             index: 0,
-            routes: [{ name: 'PersonalStack' }],
+            routes: [{ name: 'PersonalRoutes' }],
           });
         } else if (user.tipo === "Aluno") {
           navigation.reset({
             index: 0,
-            routes: [{ name: 'AlunoStack' }],
+            routes: [{ name: 'AlunoRoutes' }],
           });
         }
       } else {

@@ -38,32 +38,22 @@ export default function Router() {
           headerShown: false,
         }}
       >
-        {!userId ? (
-          <>
-            <Stack.Screen name="Login" component={LoginScreen} />
-            <Stack.Screen name="Register" component={RegisterScreen} />
-          </>
-        ) : (
-          <>
-            {userType === 'Personal' ? (
-              <Stack.Screen name="PersonalRoutes" component={PersonalRoutes} />
-            ) : (
-              <Stack.Screen name="AlunoRoutes" component={AlunoRoutes} />
-            )}
-            <Stack.Screen 
-              name="EditProfile" 
-              component={EditProfileScreen}
-              options={{
-                headerShown: true,
-                title: 'Editar Perfil',
-                headerStyle: {
-                  backgroundColor: '#1A1A1A',
-                },
-                headerTintColor: '#fff',
-              }}
-            />
-          </>
-        )}
+        <Stack.Screen name="Login" component={LoginScreen} />
+        <Stack.Screen name="Register" component={RegisterScreen} />
+        <Stack.Screen name="PersonalRoutes" component={PersonalRoutes} />
+        <Stack.Screen name="AlunoRoutes" component={AlunoRoutes} />
+        <Stack.Screen 
+          name="EditProfile" 
+          component={EditProfileScreen}
+          options={{
+            headerShown: true,
+            title: 'Editar Perfil',
+            headerStyle: {
+              backgroundColor: '#1A1A1A',
+            },
+            headerTintColor: '#fff',
+          }}
+        />
       </Stack.Navigator>
     </NavigationContainer>
   );
