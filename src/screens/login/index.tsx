@@ -1,7 +1,6 @@
-/* eslint-disable @typescript-eslint/no-require-imports */
 import React, { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
-import { View, Text, TextInput, Image, Alert } from 'react-native';
+import { View, Text, TextInput, Image, Alert, ActivityIndicator } from 'react-native';
 
 import Button from '@components//button';
 import Layout from '@components/layout';
@@ -12,15 +11,11 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { loginSchema } from '@validations/schemas';
 
 import { RootStackParamList } from 'src/routes/types';
-import { auth, db } from '../../config/FirebaseConfig';
-import { signInWithEmailAndPassword } from 'firebase/auth';
-
 import styles from './style';
-import AppStack from '@/src/routes/AppStack';
-import { getDoc } from 'firebase/firestore';
-import { doc } from 'firebase/firestore';
-import PersonalStack from '@/src/routes/PersonalStack';
-import { Select } from '@/src/components/select';
+
+import { useLoginDatabase } from '@/src/service/loginService';
+import { saveSession } from '@/src/service/session';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 type FormData = {
   email: string;
@@ -30,43 +25,57 @@ type FormData = {
 type LoginScreenNavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
 const LoginScreen = () => {
-
   const navigation = useNavigation<LoginScreenNavigationProp>();
+  const userDatabase = useLoginDatabase();
+  const [loading, setLoading] = useState(false);
+
   const {
     control,
     handleSubmit,
     formState: { errors }
   } = useForm<FormData>({
-    resolver: yupResolver(loginSchema) // Integra Yup com React Hook Form
+    resolver: yupResolver(loginSchema)
   });
 
   const onSubmit = async (data: FormData) => {
     try {
-      const userCredential = await signInWithEmailAndPassword(auth, data.email, data.password);
-      const user = userCredential.user;
-      
-      const docRef = doc(db, "usuarios", user.uid);
-      const docSnap = await getDoc(docRef);
+      setLoading(true);
+      const user = await userDatabase.login(data.email, data.password);
 
-      if (docSnap.exists()) {
-        const tipo = docSnap.data().tipo;
-        console.log("Usuário logado como:", tipo);
+      if (user) {
+        const sessionUser = {
+          id: user.id,
+          nome: user.name,
+          tipo: user.tipo as 'Personal' | 'Aluno'
+        };
 
-        // Redirecione com base no tipo
-        if (tipo === "Personal") {
-          navigation.navigate('PersonalStack');
-        } else {
-          navigation.navigate('AlunoStack');
+        await saveSession(sessionUser);
+        await AsyncStorage.setItem("userId", String(user.id));
+        await AsyncStorage.setItem("userType", user.tipo);
+
+        // Força a atualização do estado do Router
+        if (user.tipo === "Personal") {
+          navigation.reset({
+            index: 0,
+            routes: [{ name: 'PersonalStack' }],
+          });
+        } else if (user.tipo === "Aluno") {
+          navigation.reset({
+            index: 0,
+            routes: [{ name: 'AlunoStack' }],
+          });
         }
       } else {
-        Alert.alert('Erro', 'Dados do usuário não encontrados');
+        Alert.alert('Erro', 'Email ou senha inválidos');
       }
-      
     } catch (error: any) {
       console.error('Erro no login:', error);
       Alert.alert('Erro', error.message || 'Erro ao fazer login');
+    } finally {
+      setLoading(false);
     }
   };
+
   return (
     <Layout>
       <View style={styles.container}>
@@ -89,6 +98,7 @@ const LoginScreen = () => {
                     onChangeText={onChange}
                     keyboardType="email-address"
                     autoCapitalize="none"
+                    editable={!loading}
                   />
                 )}
               />
@@ -110,6 +120,7 @@ const LoginScreen = () => {
                     value={value}
                     onChangeText={onChange}
                     secureTextEntry
+                    editable={!loading}
                   />
                 )}
               />
@@ -127,11 +138,14 @@ const LoginScreen = () => {
           </View>
 
           <Button
-            text="Entrar"
+            text={loading ? "Carregando..." : "Entrar"}
             onPress={handleSubmit(onSubmit)}
             width={220}
             style={{ marginBottom: 36 }}
+            disabled={loading}
           />
+
+          {loading && <ActivityIndicator color={Colors.primary} />}
 
           <View style={{ flexDirection: 'row', gap: 10 }}>
             <Text style={{ color: Colors.white }}>Não tem uma conta?</Text>

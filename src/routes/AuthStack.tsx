@@ -3,16 +3,18 @@ import LoginScreen from '@screens/login';
 import RegisterScreen from '@screens/register';
 
 import { RootStackParamList } from './types';
+import Profile from '../screens/profile';
 // Telas
 
-const Stack = createNativeStackNavigator<RootStackParamList>();
+const AuthStack = createNativeStackNavigator<RootStackParamList>();
 
 // Rotas principais (condicionais)
-export default function AuthStack() {
+export default function AuthRoutes() {
   return (
-    <Stack.Navigator screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="Login" component={LoginScreen} />
-      <Stack.Screen name="Register" component={RegisterScreen} />
-    </Stack.Navigator>
+    <AuthStack.Navigator screenOptions={{ headerShown: false }}>
+      <AuthStack.Screen name="Login" component={LoginScreen} />
+      <AuthStack.Screen name="Register" component={RegisterScreen} />
+      <AuthStack.Screen name="Profile" component={Profile} />
+    </AuthStack.Navigator>
   );
 }

@@ -27,6 +27,8 @@ import { auth, db } from '../../config/FirebaseConfig';
 import styles from './style';
 import { Select } from '@/src/components/select';
 import { Ionicons } from '@expo/vector-icons';
+import { useUserDatabase } from '@/src/database/useUserDatabase';
+import { string } from 'yup';
 
 type FormData = {
   name: string;
@@ -41,10 +43,26 @@ type RegisterScreenNavigationProp =
 const RegisterScreen = () => {
   const navigation = useNavigation<RegisterScreenNavigationProp>();
   const [step, setStep] = useState(1);
-  const [userType, setUserType] = useState<'Aluno' | 'Personal'>('Aluno');
+  const [tipo, setUserType] = useState<'Aluno' | 'Personal'>('Aluno');
   const [personals, setPersonals] = useState<any[]>([]);
   const [selectedPersonalId, setSelectedPersonalId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [usuarios, setUsuarios] = useState<any[]>([]);
+
+  useEffect(() => {
+    const setup = async () => {
+      try {
+        const response = await userDatabase.getAllPersonal()
+        const lista = response;
+        console.log("👥 Personal encontrados:", lista);
+        setPersonals(lista);
+      }catch(error){
+        console.log(error)
+      }
+    };
+
+    setup();
+  }, []);
 
   const {
     control,
@@ -54,28 +72,31 @@ const RegisterScreen = () => {
     resolver: yupResolver(registerSchema)
   });
 
-  useEffect(() => {
-    const fetchPersonals = async () => {
-      if (step !== 2) return;
-      try {
-        const q = query(collection(db, 'usuarios'), where('tipo', '==', 'Personal'));
-        const querySnapshot = await getDocs(q);
-        const list = querySnapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data()
-        }));
-        setPersonals(list);
-      } catch (error) {
-        console.error('Erro ao buscar personais:', error);
-      }
-    };
+  const userDatabase = useUserDatabase()
 
-    fetchPersonals();
-  }, [step]);
+  async function create(data: FormData){
+    const { name, email, password} = data;
+    const personalid = selectedPersonalId;
+    try {
+      // Verifica se o email já existe
+      const emailExists = await userDatabase.checkEmailExists(email);
+      if (emailExists) {
+        Alert.alert("Erro", "Este email já está cadastrado");
+        return;
+      }
+
+      const response = await userDatabase.create({name, email, password, tipo, personalid: Number(personalid)})
+      Alert.alert("Sucesso", "Usuário cadastrado com sucesso!");
+      navigation.navigate('Login');
+    } catch (error: any) {
+      console.log(error);
+      Alert.alert("Erro", error.message || "Erro ao cadastrar usuário");
+    }
+  }
 
   const onSubmit = async (data: FormData) => {
     try {
-      if (userType === 'Aluno' && !selectedPersonalId) {
+      if (tipo === 'Aluno' && !selectedPersonalId) {
         Alert.alert('Atenção', 'Selecione um personal para continuar.');
         return;
       }
@@ -92,8 +113,8 @@ const RegisterScreen = () => {
       await setDoc(doc(db, 'usuarios', user.uid), {
         name: data.name,
         email: data.email,
-        tipo: userType,
-        personalId: userType === 'Aluno' ? selectedPersonalId : null,
+        tipo: tipo,
+        personalId: tipo === 'Aluno' ? selectedPersonalId : null,
         createdAt: new Date()
       });
 
@@ -201,14 +222,14 @@ const RegisterScreen = () => {
                   <TouchableOpacity
                     style={[
                       styles.userTypeButton,
-                      userType === 'Aluno' && styles.userTypeButtonActive
+                      tipo === 'Aluno' && styles.userTypeButtonActive
                     ]}
                     onPress={() => setUserType('Aluno')}
                   >
                     <Text
                       style={[
                         styles.userTypeText,
-                        userType === 'Aluno' && styles.userTypeTextActive
+                        tipo === 'Aluno' && styles.userTypeTextActive
                       ]}
                     >
                       Aluno
@@ -217,14 +238,14 @@ const RegisterScreen = () => {
                   <TouchableOpacity
                     style={[
                       styles.userTypeButton,
-                      userType === 'Personal' && styles.userTypeButtonActive
+                      tipo === 'Personal' && styles.userTypeButtonActive
                     ]}
                     onPress={() => setUserType('Personal')}
                   >
                     <Text
                       style={[
                         styles.userTypeText,
-                        userType === 'Personal' && styles.userTypeTextActive
+                        tipo === 'Personal' && styles.userTypeTextActive
                       ]}
                     >
                       Personal
@@ -233,18 +254,18 @@ const RegisterScreen = () => {
                 </View>
 
                 <Button
-                  text={userType === 'Aluno' ? 'Próximo' : isLoading ? 'Cadastrando...' : 'Cadastrar'}
+                  text={tipo === 'Aluno' ? 'Próximo' : isLoading ? 'Cadastrando...' : 'Cadastrar'}
                   onPress={
-                    userType === 'Aluno'
+                    tipo === 'Aluno'
                       ? () => setStep(2)
-                      : handleSubmit(onSubmit)
+                      : handleSubmit(create)
                   }
                   style={{ opacity: isLoading ? 0.7 : 1 }}
                 />
               </>
             )}
 
-            {step === 2 && userType === 'Aluno' && (
+            {step === 2 && tipo === 'Aluno' && (
               <>
                 <Text style={{color: '#fff'}}>Escolha seu Personal</Text>
                 {personals.length === 0 ? (
@@ -262,10 +283,13 @@ const RegisterScreen = () => {
                     placeholder="Selecione um personal"
                   />
                 )}
+                {usuarios.map(user => (
+                  <Text key={user.id}>{user.name}</Text>
+                ))}
 
                 <Button
                   text={isLoading ? 'Cadastrando...' : 'Finalizar Cadastro'}
-                  onPress={handleSubmit(onSubmit)}
+                  onPress={handleSubmit(create)}
                   disabled={!selectedPersonalId || isLoading}
                 />
               </>

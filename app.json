@@ -9,10 +9,10 @@
     "splash": {
       "image": "./assets/icons/splash-icon-light.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff",
+      "backgroundColor": "#000",
       "dark": {
         "image": "./assets/icons/splash-icon-dark.png",
-        "backgroundColor": "#000000"
+        "backgroundColor": "#2A2634"
       }
     },
     "assetBundlePatterns": [
@@ -31,7 +31,17 @@
     },
     "plugins": [
       "expo-dev-client",
-      "expo-font"
+      "expo-font",
+      ["expo-sqlite",
+        {
+          "enableFTS": true,
+          "useSQLCipher": true,
+          "android": {
+            "enableFTS": false,
+            "useSQLCipher": false
+          }
+        }
+      ]
     ],
     "extra": {
       "eas": {

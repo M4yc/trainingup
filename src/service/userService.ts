@@ -1,76 +1,34 @@
-import { auth, db } from '../config/FirebaseConfig';
-import { doc, getDoc, updateDoc } from 'firebase/firestore';
+// src/service/useUserService.ts
+import { useSQLiteContext } from "expo-sqlite";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
-export interface Usuario {
-  id: string;
-  name?: string;
+export type Usuario = {
+  id: number;
+  name: string;
   email: string;
-  tipo: "Aluno" | "Personal";
-  createdAt: Date;
-}
+  tipo: string;
+  personal_id: number;
+};
 
-export const userService = {
-  // Buscar dados do usuário atual
-  getCurrentUser: async (): Promise<Usuario | null> => {
+export function useUserService() {
+  const db = useSQLiteContext();
+
+  async function getCurrentUser(): Promise<Usuario | null> {
     try {
-      const user = auth.currentUser;
-      if (!user) return null;
+      const userId = await AsyncStorage.getItem("userId");
+      if (!userId) return null;
 
-      const docRef = doc(db, "usuarios", user.uid);
-      const docSnap = await getDoc(docRef);
+      const user = await db.getFirstAsync<Usuario>(
+        `SELECT id, name, email, tipo, personal_id FROM usuarios WHERE id = ?`,
+        [userId]
+      );
 
-      if (docSnap.exists()) {
-        const data = docSnap.data();
-        return {
-          id: user.uid,
-          name: data.name,
-          email: data.email,
-          tipo: data.tipo,
-          createdAt: data.createdAt.toDate()
-        };
-      }
-      return null;
+      return user || null;
     } catch (error) {
-      console.error("Erro ao buscar dados do usuário:", error);
-      return null;
-    }
-  },
-
-  // Atualizar dados do usuário
-  updateUser: async (userId: string, data: Partial<Usuario>): Promise<boolean> => {
-    try {
-      const docRef = doc(db, "usuarios", userId);
-      await updateDoc(docRef, {
-        ...data,
-        updatedAt: new Date()
-      });
-      return true;
-    } catch (error) {
-      console.error("Erro ao atualizar dados do usuário:", error);
-      return false;
-    }
-  },
-
-  // Buscar dados de um usuário específico
-  getUserById: async (userId: string): Promise<Usuario | null> => {
-    try {
-      const docRef = doc(db, "usuarios", userId);
-      const docSnap = await getDoc(docRef);
-
-      if (docSnap.exists()) {
-        const data = docSnap.data();
-        return {
-          id: userId,
-          name: data.name,
-          email: data.email,
-          tipo: data.tipo,
-          createdAt: data.createdAt.toDate()
-        };
-      }
-      return null;
-    } catch (error) {
-      console.error("Erro ao buscar dados do usuário:", error);
+      console.error("Erro ao buscar usuário atual:", error);
       return null;
     }
   }
-}; 
+
+  return { getCurrentUser };
+}

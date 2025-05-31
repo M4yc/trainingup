@@ -1,15 +1,20 @@
 /* eslint-disable @typescript-eslint/no-require-imports */
 import React, { useState, useEffect } from 'react';
-import { View, Text, Image, TouchableOpacity, ScrollView, ActivityIndicator } from 'react-native';
+import { View, Text, Image, TouchableOpacity, ScrollView, ActivityIndicator, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { Feather } from '@expo/vector-icons';
+import { Feather, Ionicons } from '@expo/vector-icons';
 
 import Layout from '../../components/layout';
+import Button from '@components/button';
 
 import styles from './style';
-import { auth } from '@/src/config/FirebaseConfig';
-import { userService, Usuario } from '@/src/service/userService';
+import { useUserService, Usuario } from '@/src/service/userService';
+import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { RootStackParamList } from '@/src/routes/types';
+import { clearSession, getSession } from '@/src/service/session';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 type MenuItem = {
   icon: keyof typeof Feather.glyphMap;
@@ -17,38 +22,80 @@ type MenuItem = {
   onPress: () => void;
 };
 
+type LoginScreenNavigationProp = NativeStackNavigationProp<RootStackParamList>;
+
 const Profile = () => {
   const [user, setUser] = useState<Usuario | null>(null);
   const [loading, setLoading] = useState(true);
+  const userService = useUserService();
+  const navigation = useNavigation<LoginScreenNavigationProp>();
 
   useEffect(() => {
-    const getUser = async () => {
+    const loadUserData = async () => {
       try {
+        setLoading(true);
+        // Primeiro, verifica se há uma sessão ativa
+        const session = await getSession();
+        if (!session) {
+          console.log("Nenhuma sessão encontrada");
+          navigation.reset;
+          return;
+        }
+
+        // Busca os dados completos do usuário
         const userData = await userService.getCurrentUser();
+        console.log("Dados do usuário:", userData);
+        
         setUser(userData);
       } catch (error) {
-        console.error("Error loading profile data:", error);
+        console.error("Erro ao carregar dados do perfil:", error);
+        Alert.alert("Erro", "Não foi possível carregar os dados do perfil");
       } finally {
         setLoading(false);
       }
     };
 
-    getUser();
+    loadUserData();
   }, []);
+
+  const handleSignOut = async () => {
+    try {
+      await clearSession();
+      await AsyncStorage.removeItem('userId');
+      await AsyncStorage.removeItem('userType');
+      navigation.reset({
+        index: 0,
+        routes: [{ name: 'Login' }],
+      });
+    } catch (error) {
+      console.error("Erro ao fazer logout:", error);
+      Alert.alert("Erro", "Não foi possível fazer logout");
+    }
+  };
 
   if (loading) {
     return (
-      <View style={styles.container}>
-        <ActivityIndicator size="large" />
-      </View>
+      <Layout>
+        <View style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
+          <ActivityIndicator size="large" color="#44BF86" />
+        </View>
+      </Layout>
     );
   }
 
   if (!user) {
     return (
-      <View style={styles.container}>
-        <Text>User not found</Text>
-      </View>
+      <Layout>
+        <View style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
+          <Text style={{ color: '#fff' }}>Usuário não encontrado</Text>
+          <TouchableOpacity 
+            style={{ marginTop: 20, padding: 10, backgroundColor: '#44BF86', borderRadius: 5 }}
+            onPress={handleSignOut}
+          >
+            <Text style={{ color: '#fff' }}>Voltar para o Login</Text>
+          </TouchableOpacity>
+        </View>
+      </Layout>
     );
   }
 
@@ -62,7 +109,7 @@ const Profile = () => {
     {
       icon: 'user',
       text: 'Editar Perfil',
-      onPress: () => null
+      onPress: () => navigation.navigate('EditProfile', { userId: user.id })
     },
     {
       icon: 'settings',
@@ -75,14 +122,6 @@ const Profile = () => {
       onPress: () => null
     }
   ];
-
-  const handleSignOut = async () => {
-    try {
-      await auth.signOut();
-    } catch (error) {
-      console.error("Error signing out:", error);
-    }
-  };
 
   return (
     <Layout>
@@ -98,7 +137,7 @@ const Profile = () => {
                 <Feather name="camera" size={20} color="#FFFFFF" />
               </TouchableOpacity>
             </View>
-            <Text style={styles.userName}>{user.name || 'Name not set'}</Text>
+            <Text style={styles.userName}>{user.name || 'Nome não definido'}</Text>
             <Text style={styles.userEmail}>{user.email}</Text>
             <View style={styles.statusBadge}>
               <Text style={styles.statusText}>{user.tipo}</Text>

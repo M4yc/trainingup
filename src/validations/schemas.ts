@@ -1,5 +1,5 @@
 import * as yup from 'yup';
-import { isValidDate,isAfter } from './dateValidations';
+import { isValidDate, isAfter } from './dateValidations';
 // Esquema de validação para Login
 export const loginSchema = yup.object().shape({
   email: yup
@@ -13,23 +13,17 @@ export const loginSchema = yup.object().shape({
 });
 
 // Esquema de validação para Registro
-export const registerSchema = yup.object().shape({
-  name: yup
-    .string()
-    .min(3, 'O nome deve ter no mínimo 3 caracteres')
-    .required('Nome é obrigatório'),
-  email: yup
-    .string()
-    .email('Digite um e-mail válido')
-    .required('E-mail é obrigatório'),
+export const registerSchema = yup.object({
+  name: yup.string().required('Nome é obrigatório'),
+  email: yup.string().email('E-mail inválido').required('E-mail é obrigatório'),
   password: yup
     .string()
     .min(6, 'A senha deve ter no mínimo 6 caracteres')
     .required('Senha é obrigatória'),
   confirmPassword: yup
     .string()
-    .oneOf([yup.ref('password')], 'As senhas não conferem')
-    .required('Confirmação de senha é obrigatória')
+    .oneOf([yup.ref('password')], 'As senhas não coincidem')
+    .required('Confirmação de senha é obrigatória'),
 });
 
 // Esquema de validação para Ficha de Treino
@@ -67,4 +61,10 @@ export const fichaTreinoSchema = yup.object().shape({
       )
     })
   )
+});
+
+// Esquema de validação para Edição de Perfil
+export const editProfileSchema = yup.object().shape({
+  name: yup.string().required('Nome é obrigatório'),
+  email: yup.string().email('E-mail inválido').required('E-mail é obrigatório'),
 });

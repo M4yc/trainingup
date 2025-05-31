@@ -1,8 +1,11 @@
 export type RootStackParamList = {
   Login: undefined;
   Register: undefined;
-  AlunoStack: undefined;
-  PersonalStack: undefined;
+  PersonalRoutes: undefined;
+  AlunoRoutes: undefined;
+  EditProfile: {
+    userId: number;
+  };
 };
 
 export type AppTabParamList = {
@@ -10,26 +13,24 @@ export type AppTabParamList = {
   TreinosScreen: undefined;
   Estatistica: undefined;
   Perfil: undefined;
+};
+
+export type PersonalTabParamList = {
+  Dashboard: undefined;
   Alunos: undefined;
+  Estatistica: undefined;
+  Perfil: undefined;
 };
 
 export type AppStackParamList = {
   MainTabs: undefined;
-  TreinoDesc: {
-    nome: string;
-    musculoAlvo: string;
-    series: number;
-    repeticoes: number;
-    peso: string;
-    intervalo: string;
-    descricao: string;
-    imagem: string;
-    numero: number;
-  };
-  Configuracoes: undefined;
-  Exercicio: undefined;
-  Corpo: undefined;
-  FichaTreinoAluno: undefined;
+  TreinoDesc: { id: string };
+};
+
+export type PersonalStackParamList = {
+  MainTabs: undefined;
+  DashboardPersonal: undefined;
   CreateWorkoutPlan: undefined;
   NovaFichaTreino: undefined;
+  TreinoDesc: { id: string };
 };

@@ -7,20 +7,20 @@ import TreinoDesc from '@screens/treinoDesc';
 import AppTabNavigatorPersonal from './tabRoutesPersonal';
 // Telas
 
-const Stack = createNativeStackNavigator();
+const PersonalStack = createNativeStackNavigator();
 
 // Rotas principais (condicionais)
-export default function PersonalStack() {
+export default function PersonalRoutes() {
   return (
-    <Stack.Navigator
+    <PersonalStack.Navigator
       screenOptions={{ headerShown: false }}
       initialRouteName="MainTabs"
     >
-      <Stack.Screen name="MainTabs" component={AppTabNavigatorPersonal} />
-      <Stack.Screen name="DashboardPersonal" component={DashboardPersonal} />
-      <Stack.Screen name="CreateWorkoutPlan" component={CreateWorkoutPlan} />
-      <Stack.Screen name="NovaFichaTreino" component={NovaFichaTreino} />
-      <Stack.Screen name="TreinoDesc" component={TreinoDesc} />
-    </Stack.Navigator>
+      <PersonalStack.Screen name="MainTabs" component={AppTabNavigatorPersonal} />
+      <PersonalStack.Screen name="DashboardPersonal" component={DashboardPersonal} />
+      <PersonalStack.Screen name="CreateWorkoutPlan" component={CreateWorkoutPlan} />
+      <PersonalStack.Screen name="NovaFichaTreino" component={NovaFichaTreino} />
+      <PersonalStack.Screen name="TreinoDesc" component={TreinoDesc} />
+    </PersonalStack.Navigator>
   );
 }

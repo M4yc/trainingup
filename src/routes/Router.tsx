@@ -1,59 +1,68 @@
 import React, { useEffect, useState } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { User } from 'firebase/auth';
-import RegisterScreen from '../screens/register';
-import LoginScreen from '../screens/login';
-import { auth, db } from '../config/FirebaseConfig';
-import AppStack from './AppStack';
-import PersonalStack from './PersonalStack';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+import LoginScreen from '@/src/screens/login';
+import RegisterScreen from '@/src/screens/register';
+import EditProfileScreen from '@/src/screens/editProfile';
+import PersonalRoutes from '@/src/routes/PersonalStack';
+import AlunoRoutes from '@/src/routes/AlunoStack';
 import { RootStackParamList } from './types';
-import { doc, getDoc } from 'firebase/firestore';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
-export function Router() {
-  const [user, setUser] = useState<User | null>(null);
+export default function Router() {
+  const [userId, setUserId] = useState<string | null>(null);
   const [userType, setUserType] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged(async (_user) => {
-      setUser(_user);
-      if (_user) {
-        try {
-          const docRef = doc(db, "usuarios", _user.uid);
-          const docSnap = await getDoc(docRef);
-          if (docSnap.exists()) {
-            setUserType(docSnap.data().tipo);
-          }
-        } catch (error) {
-          console.error("Erro ao buscar tipo de usuário:", error);
-        }
-      } else {
-        setUserType(null);
-      }
-      setLoading(false);
-    });
-    return () => unsubscribe();
+    checkLogin();
   }, []);
 
-  if (loading) {
-    return null; // ou um componente de loading
-  }
+  const checkLogin = async () => {
+    try {
+      const storedUserId = await AsyncStorage.getItem('userId');
+      const storedUserType = await AsyncStorage.getItem('userType');
+      setUserId(storedUserId);
+      setUserType(storedUserType);
+    } catch (error) {
+      console.error('Erro ao verificar login:', error);
+    }
+  };
 
   return (
     <NavigationContainer>
-      <Stack.Navigator screenOptions={{ headerShown: false }}>
-        {!user ? (
+      <Stack.Navigator
+        screenOptions={{
+          headerShown: false,
+        }}
+      >
+        {!userId ? (
           <>
             <Stack.Screen name="Login" component={LoginScreen} />
             <Stack.Screen name="Register" component={RegisterScreen} />
           </>
-        ) : userType === 'Personal' ? (
-          <Stack.Screen name="PersonalStack" component={PersonalStack} />
         ) : (
-          <Stack.Screen name="AlunoStack" component={AppStack} />
+          <>
+            {userType === 'Personal' ? (
+              <Stack.Screen name="PersonalRoutes" component={PersonalRoutes} />
+            ) : (
+              <Stack.Screen name="AlunoRoutes" component={AlunoRoutes} />
+            )}
+            <Stack.Screen 
+              name="EditProfile" 
+              component={EditProfileScreen}
+              options={{
+                headerShown: true,
+                title: 'Editar Perfil',
+                headerStyle: {
+                  backgroundColor: '#1A1A1A',
+                },
+                headerTintColor: '#fff',
+              }}
+            />
+          </>
         )}
       </Stack.Navigator>
     </NavigationContainer>
