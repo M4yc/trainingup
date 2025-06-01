@@ -3,7 +3,7 @@ import { StyleSheet } from 'react-native';
 const styles = StyleSheet.create({
   header: {
     backgroundColor: '#211d28',
-    padding: 20,
+    padding: 16,
     marginBottom: 16
   },
   title: {
@@ -18,27 +18,31 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
-    backgroundColor: '#211d28',
-    padding: 20
+    padding: 16
   },
   fab: {
     position: 'absolute',
-    right: 20,
-    bottom: 20,
+    right: 16,
+    bottom: 16,
+    backgroundColor: '#44BF86',
     width: 56,
     height: 56,
     borderRadius: 28,
-    backgroundColor: '#44BF86',
     justifyContent: 'center',
     alignItems: 'center',
-    elevation: 4,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84
+    elevation: 4
+  },
+  loadingText: {
+    color: '#fff',
+    fontSize: 16,
+    textAlign: 'center',
+    marginTop: 20
+  },
+  emptyText: {
+    color: '#666',
+    fontSize: 16,
+    textAlign: 'center',
+    marginTop: 20
   }
 });
 

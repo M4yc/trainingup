@@ -5,7 +5,8 @@ import {
   TextInput,
   FlatList,
   TouchableOpacity,
-  ScrollView
+  ScrollView,
+  Alert
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -15,22 +16,24 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
 import Colors from '@constants/colors';
 import { styles } from './styles';
-import { FichaTreinoService } from '@/src/service/fichaTreinoService';
+import { FichaTreinoService, FichaTreino } from '@/src/service/fichaTreinoService';
 import { usePersonalService } from '@/src/database/personalService';
 import { useIsFocused } from '@react-navigation/native';
 
 type RootStackParamList = {
-  ListaAlunos: undefined;
+  FichasAlunos: undefined;
   NovoAluno: undefined;
   CreateWorkoutPlan: {
     alunoId: string;
     alunoNome: string;
+    fichaId?: string;
+    modo: 'criar' | 'editar';
   };
 };
 
 type NavigationProp = NativeStackNavigationProp<
   RootStackParamList,
-  'ListaAlunos'
+  'FichasAlunos'
 >;
 
 type Aluno = {
@@ -38,76 +41,125 @@ type Aluno = {
   name: string;  
 };
 
-const alunosExemplo: Aluno[] = [
-  {
-    id: 1,
-    name: 'João Silva',
-  },
-  {
-    id: 2,
-    name: 'Maria Santos',
-  }
-];
+type FichaComAluno = FichaTreino & {
+  alunoNome: string;
+};
 
-export default function AlunosScreen() {
+export default function FichasAlunosScreen() {
   const navigation = useNavigation<NavigationProp>();
   const [busca, setBusca] = useState('');
   const [ordenacao, setOrdenacao] = useState('nome');
   const [alunos, setAlunos] = useState<Aluno[]>([]);
+  const [fichas, setFichas] = useState<FichaComAluno[]>([]);
   const personalService = usePersonalService();
   const fichaTreinoService = FichaTreinoService();
   const isFocused = useIsFocused();
 
+  const formatarData = (data: string) => {
+    if (!data) return '';
+    try {
+      if (data.includes('-')) {
+        const [ano, mes, dia] = data.split('-');
+        return `${dia}/${mes}/${ano}`;
+      }
+      return data;
+    } catch (error) {
+      console.error('Erro ao formatar data:', data, error);
+      return data;
+    }
+  };
+
+  const carregarFichas = async () => {
+    try {
+      const fichasPersonal = await fichaTreinoService.getFichasByPersonal(1);
+      const alunosPersonal = await personalService.getAlunosPersonal(1);
+      
+      // Mapear as fichas com os nomes dos alunos
+      const fichasComAlunos = fichasPersonal.map(ficha => {
+        const aluno = alunosPersonal.find(a => a.id === ficha.aluno_id);
+        return {
+          ...ficha,
+          alunoNome: aluno?.name || 'Aluno não encontrado'
+        };
+      });
+      
+      setFichas(fichasComAlunos);
+      setAlunos(alunosPersonal);
+    } catch (error) {
+      console.error('Erro ao carregar dados:', error);
+      Alert.alert('Erro', 'Não foi possível carregar as fichas');
+    }
+  };
+
   useEffect(() => {
-    const setup = async () => {
-      const fichas = await fichaTreinoService.getFichasByPersonal(1);
-      console.log('Fichas: ', fichas);
-    };
     if (isFocused) {
-      setup();
+      carregarFichas();
     }
   }, [isFocused]);
 
-  useEffect(() => {
-    const setup = async () => {
-      try {
-        const alunos= await personalService.getAlunosPersonal(1);
-        setAlunos(alunos);
-      }catch(error){
-        console.log(error)
-      }
-    };
-  
-    setup();
-  }, []);
-  console.log('Alunos: ', alunos);
-  
-  const filtrarAlunos = () => {
-    let alunosFiltrados = [...alunos];
+  const handleDeleteFicha = async (fichaId: number) => {
+    Alert.alert(
+      'Confirmar exclusão',
+      'Tem certeza que deseja excluir esta ficha?',
+      [
+        {
+          text: 'Cancelar',
+          style: 'cancel'
+        },
+        {
+          text: 'Excluir',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              await fichaTreinoService.deletarFicha(fichaId);
+              Alert.alert('Sucesso', 'Ficha excluída com sucesso');
+              carregarFichas(); // Recarrega a lista após excluir
+            } catch (error) {
+              console.error('Erro ao excluir ficha:', error);
+              Alert.alert('Erro', 'Não foi possível excluir a ficha');
+            }
+          }
+        }
+      ]
+    );
+  };
 
-    // Filtro por busca
+  const handleEditFicha = (ficha: FichaComAluno) => {
+    navigation.navigate('CreateWorkoutPlan', {
+      alunoId: ficha.aluno_id.toString(),
+      alunoNome: ficha.alunoNome,
+      fichaId: ficha.id.toString(),
+      modo: 'editar'
+    });
+  };
+
+  const filtrarFichas = () => {
+    let fichasFiltradas = [...fichas];
+
     if (busca) {
-      alunosFiltrados = alunosFiltrados.filter((aluno) =>
-        aluno.name.toLowerCase().includes(busca.toLowerCase())
+      fichasFiltradas = fichasFiltradas.filter((ficha) =>
+        ficha.alunoNome.toLowerCase().includes(busca.toLowerCase())
       );
     }
 
-    // Ordenação
-    alunosFiltrados.sort((a: Aluno, b: Aluno) => {
+    fichasFiltradas.sort((a, b) => {
       if (ordenacao === 'nome') {
-        return a.name.localeCompare(b.name);
+        return a.alunoNome.localeCompare(b.alunoNome);
       }
       return 0;
     });
 
-    return alunosFiltrados;
+    return fichasFiltradas;
   };
 
-  const renderAluno = ({ item }: { item: Aluno }) => (
+  const renderFicha = ({ item }: { item: FichaComAluno }) => (
     <TouchableOpacity style={styles.alunoCard}>
       <View style={styles.alunoHeader}>
         <View>
-          <Text style={styles.alunoNome}>{item.name}</Text>
+          <Text style={styles.alunoNome}>{item.alunoNome}</Text>
+          <Text style={styles.fichaInfo}>
+            Início: {formatarData(item.data_inicio)} - Fim: {formatarData(item.data_fim)}
+          </Text>
         </View>
       </View>
 
@@ -116,8 +168,9 @@ export default function AlunosScreen() {
           style={[styles.acaoButton, { backgroundColor: '#44BF86' }]}
           onPress={() =>
             navigation.navigate('CreateWorkoutPlan', {
-              alunoId: item.id.toString(),
-              alunoNome: item.name
+              alunoId: item.aluno_id.toString(),
+              alunoNome: item.alunoNome,
+              modo: 'criar'
             })
           }
         >
@@ -126,12 +179,14 @@ export default function AlunosScreen() {
         </TouchableOpacity>
         <TouchableOpacity
           style={[styles.acaoButton, { backgroundColor: '#00908E' }]}
+          onPress={() => handleEditFicha(item)}
         >
           <Feather name="edit-3" size={20} color="#fff" />
           <Text style={styles.acaoButtonText}>Editar</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={[styles.acaoButton, { backgroundColor: '#FF6B6B' }]}
+          onPress={() => handleDeleteFicha(item.id)}
         >
           <Feather name="trash-2" size={20} color="#FFFFFF" />
           <Text style={styles.acaoText}>Excluir</Text>
@@ -144,8 +199,7 @@ export default function AlunosScreen() {
     <View style={styles.container}>
       <SafeAreaView edges={['top']} style={{ flex: 1 }}>
         <View style={styles.header}>
-          <Text style={styles.title}>Meus Alunos</Text>
-          
+          <Text style={styles.title}>Fichas de Treino</Text>
         </View>
 
         <View style={styles.searchContainer}>
@@ -182,8 +236,8 @@ export default function AlunosScreen() {
         </View>
 
         <FlatList
-          data={filtrarAlunos()}
-          renderItem={renderAluno}
+          data={filtrarFichas()}
+          renderItem={renderFicha}
           keyExtractor={(item) => item.id.toString()}
           contentContainerStyle={styles.listaContainer}
           showsVerticalScrollIndicator={false}
@@ -194,7 +248,8 @@ export default function AlunosScreen() {
           style={styles.fabButton}
           onPress={() => navigation.navigate('CreateWorkoutPlan', {
             alunoId: '',
-            alunoNome: ''
+            alunoNome: '',
+            modo: 'criar'
           })}
         >
           <Feather name="file-plus" size={24} color="#FFFFFF" />

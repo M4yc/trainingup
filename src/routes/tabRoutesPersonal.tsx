@@ -1,7 +1,7 @@
 import { MaterialIcons } from '@expo/vector-icons';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import AlunosScreen from '@screens/alunos';
+import FichasAlunosScreen from '@/src/screens/fichas';
 import DashboardPersonal from '@screens/dashboardPersonal';
 import Estatistica from '@screens/estatistica';
 import NovoAluno from '@screens/novoAluno';
@@ -20,7 +20,7 @@ const Colors = {
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
 
-function AlunosNavigator() {
+function FichasAlunosNavigator() {
   return (
     <Stack.Navigator
       screenOptions={{
@@ -28,7 +28,7 @@ function AlunosNavigator() {
         animation: 'slide_from_right'
       }}
     >
-      <Stack.Screen name="ListaAlunos" component={AlunosScreen} />
+      <Stack.Screen name="FichasAlunos" component={FichasAlunosScreen} />
       <Stack.Screen name="NovoAluno" component={NovoAluno} />
     </Stack.Navigator>
   );
@@ -74,11 +74,11 @@ export default function AppTabNavigatorPersonal() {
         }}
       />
       <Tab.Screen
-        name="Alunos"
-        component={AlunosNavigator}
+        name="FichasAlunos"
+        component={FichasAlunosNavigator}
         options={{
           tabBarIcon: ({ color }) => (
-            <MaterialIcons name="people" size={28} color={color} />
+            <MaterialIcons name="content-paste" size={28} color={color} />
           )
         }}
       />

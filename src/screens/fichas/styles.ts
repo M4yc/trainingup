@@ -254,8 +254,13 @@ export const styles = StyleSheet.create({
     marginLeft: 8
   },
   acaoText: {
-    color: Colors.white,
+    color: '#FFFFFF',
     fontSize: 14,
-    marginLeft: 8
-  }
+    marginLeft: 4,
+  },
+  fichaInfo: {
+    color: '#666',
+    fontSize: 14,
+    marginTop: 4,
+  },
 });

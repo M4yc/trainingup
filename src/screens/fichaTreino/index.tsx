@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import { View, Text, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, Alert } from 'react-native';
 
 import Layout from '@components/layout';
 import WorkoutCard from '@components/WorkoutCard';
@@ -9,71 +9,95 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { AppStackParamList } from 'src/routes/types';
 
 import styles from './style';
-import { buscarFichasDoAluno } from '@/src/service/fichaService';
-import { Ficha } from '@/src/types/types';
-import { userService, Usuario } from '@/src/service/userService';
+
+import { FichaTreinoService } from '@/src/service/fichaTreinoServiceAluno';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useUserService, Usuario } from '@/src/service/userService';
+import { getSession } from '@/src/service/session';
 
 type NavigationProp = NativeStackNavigationProp<AppStackParamList>;
 
-// Dados mockados para exemplo
-const mockWorkouts = [
-  {
-    id: '1',
-    title: 'Segunda-Feira - Superior',
-    exerciseCount: 8,
-    lastUpdated: '15/03/2024'
-  },
-  {
-    id: '2',
-    title: 'Terça-Feira - Inferior',
-    exerciseCount: 6,
-    lastUpdated: '15/03/2024'
-  }
-];
-
 const FichaTreinoScreen = () => {
   const navigation = useNavigation<NavigationProp>();
-
-  const [user, setUser] = useState<Usuario | null>(null);
   const [loading, setLoading] = useState(true);
-
+  const [fichas, setFichas] = useState<any[]>([]);
+  const [user, setUser] = useState<Usuario | null>(null);
+  const fichaService = FichaTreinoService();
+  const userService = useUserService();
+  
   useEffect(() => {
-    const getUser = async () => {
+    const loadUserData = async () => {
       try {
+        setLoading(true);
+        
+        const session = await getSession();
+        if (!session) {
+          navigation.reset;
+          return;
+        }
+        
         const userData = await userService.getCurrentUser();
         setUser(userData);
       } catch (error) {
-        console.error("Error loading profile data:", error);
+        console.error("Erro ao carregar dados do perfil:", error);
+        Alert.alert("Erro", "Não foi possível carregar os dados do perfil");
       } finally {
         setLoading(false);
       }
     };
 
-    getUser();
+    loadUserData();
   }, []);
 
-  const [fichas, setFichas] = useState<Ficha[]>([]);
-
-  const alunoId = user?.id; // ID real do aluno autenticado
-
   useEffect(() => {
-    async function carregarFichas() {
-      if (!alunoId) {
-        console.warn("ID do aluno não está disponível ainda.");
-        return;
+    async function loadFichas() {
+      try {
+        if (!user?.id) return;
+  
+        const res = await fichaService.getFichasByAluno(Number(user.id));
+        setFichas(res);
+      } catch (error) {
+        console.error('Erro ao carregar fichas:', error);
+        Alert.alert('Erro', 'Não foi possível carregar as fichas de treino');
       }
-      try{
-        const resultado = await buscarFichasDoAluno(alunoId);
-        setFichas(resultado);
-      } catch (error){
-        console.error('❌ Erro ao buscar fichas:', error);
-      }
-      
     }
+  
+    loadFichas();
+  }, [user]);
 
-    carregarFichas();
-  }, [alunoId]);
+  const getTotalExercicios = (ficha: any) => {
+    if (!ficha?.grupos) return 0;
+    
+    return ficha.grupos.reduce((total: number, grupo: any) => {
+      return total + (grupo.exercicios?.length || 0);
+    }, 0);
+  };
 
+  const formatarData = (data: string) => {
+    if (!data) return '';
+    try {
+      console.log('Data recebida para formatação:', data);
+      // Verifica se a data está no formato YYYY-MM-DD
+      if (data.includes('-')) {
+        const [ano, mes, dia] = data.split('-');
+        return `${dia}/${mes}/${ano}`;
+      }
+      // Se a data já estiver no formato DD/MM/YYYY, retorna ela mesma
+      if (data.includes('/')) {
+        return data;
+      }
+      // Se não estiver em nenhum dos formatos esperados, retorna a data original
+      return data;
+    } catch (error) {
+      console.error('Erro ao formatar data:', data, error);
+      return data;
+    }
+  };
+
+  const handleFichaPress = (ficha: any) => {
+    navigation.navigate('TreinoDesc', { id: ficha.id.toString() });
+  };
+  
   return (
     <Layout>
       <View style={styles.header}>
@@ -82,37 +106,23 @@ const FichaTreinoScreen = () => {
       </View>
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-        {fichas.map((fichas) => (
-          <WorkoutCard
-            key={fichas.id}
-            title={fichas.nome}
-            exerciseCount={fichas.treinos.reduce((total, treino) => total + treino.exercicios.length, 0)}
-            createDate={fichas.dataCriacao}
-            
-          />
-        ))}
+        {loading ? (
+          <Text style={styles.loadingText}>Carregando fichas...</Text>
+        ) : fichas.length === 0 ? (
+          <Text style={styles.emptyText}>Nenhuma ficha de treino encontrada</Text>
+        ) : (
+          fichas.map((ficha) => (
+            <WorkoutCard
+              key={ficha.id}
+              title={`Ficha de Treino ${ficha.id}`}
+              exerciseCount={getTotalExercicios(ficha)}
+              createDate={formatarData(ficha.data_inicio)}
+              endDate={formatarData(ficha.data_fim)}
+              onPress={() => handleFichaPress(ficha)}
+            />
+          ))
+        )}
       </ScrollView>
-      <ScrollView style={{ padding: 20 }}>
-        {fichas.map(ficha => (
-          <View key={ficha.id} style={{ marginBottom: 30, backgroundColor: '#fff' }}>
-            <Text style={{ fontSize: 20, fontWeight: 'bold' }}>{ficha.nome}</Text>
-            <Text>{ficha.descricao}</Text>
-            <Text style={{ fontStyle: 'italic' }}>Criada em: {ficha.dataCriacao}</Text>
-
-            {ficha.treinos.map(treino => (
-              <View key={treino.nome} style={{ marginTop: 10, paddingLeft: 10 }}>
-                <Text style={{ fontWeight: 'bold' }}>Treino: {treino.nome}</Text>
-                <Text>Dias: {treino.diasSemana.join(', ')}</Text>
-                {treino.exercicios.map((ex, index) => (
-                  <Text key={index}>
-                    {ex.ordem}. {ex.nome} - {ex.series}x{ex.repeticoes} ({ex.carga ?? 0} kg)
-                  </Text>
-                ))}
-              </View>
-            ))}
-          </View>
-        ))}
-    </ScrollView>
     </Layout>
   );
 };

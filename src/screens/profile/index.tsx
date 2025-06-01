@@ -6,7 +6,6 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Feather, Ionicons } from '@expo/vector-icons';
 
 import Layout from '../../components/layout';
-import Button from '@components/button';
 
 import styles from './style';
 import { useUserService, Usuario } from '@/src/service/userService';
@@ -34,17 +33,16 @@ const Profile = () => {
     const loadUserData = async () => {
       try {
         setLoading(true);
-        // Primeiro, verifica se há uma sessão ativa
+        
         const session = await getSession();
         if (!session) {
-          console.log("Nenhuma sessão encontrada");
+          // console.log("Nenhuma sessão encontrada");
           navigation.reset;
           return;
         }
-
-        // Busca os dados completos do usuário
+        
         const userData = await userService.getCurrentUser();
-        console.log("Dados do usuário:", userData);
+        // console.log("Dados do usuário:", userData);
         
         setUser(userData);
       } catch (error) {
@@ -130,7 +128,7 @@ const Profile = () => {
           <View style={styles.header}>
             <View style={styles.avatarContainer}>
               <Image
-                source={require('../../assets/imgs/userProfile.jpg')}
+                source={require('../../assets/imgs/profile.png')}
                 style={styles.avatar}
               />
               <TouchableOpacity style={styles.editAvatarButton}>
