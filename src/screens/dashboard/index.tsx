@@ -58,23 +58,6 @@ const Dashboard = () => {
             </View>
           </ImageBackground>
         </TouchableOpacity>
-
-        {/* Próximos Treinos */}
-        <Text style={styles.sectionTitle}>Próximos Treinos</Text>
-
-        <WorkoutCard
-          title="Treino B - Inferiores"
-          exerciseCount={6}
-          lastUpdated="Ontem"
-          onPress={() => {}}
-        />
-
-        <WorkoutCard
-          title="Treino C - Full Body"
-          exerciseCount={10}
-          lastUpdated="2 dias atrás"
-          onPress={() => {}}
-        />
       </View>
     </Layout>
   );

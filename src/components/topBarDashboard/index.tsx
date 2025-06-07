@@ -1,23 +1,32 @@
 /* eslint-disable @typescript-eslint/no-require-imports */
 import React, { useEffect, useState } from 'react';
-import { View, Text, Image } from 'react-native';
+import { View, Text, Image, Alert } from 'react-native';
 
 import { Ionicons } from '@expo/vector-icons';
 
 import Colors from '../../constants/colors';
 import styles from './style';
-import { userService, Usuario } from '@/src/service/userService';
+import { useUserService, Usuario } from '@/src/service/userService';
+import { getSession } from '@/src/service/session';
 
 const TopBarDashboard: React.FC = () => {
   const [user, setUser] = useState<Usuario | null>(null);
+  const userService = useUserService();
 
   useEffect(() => {
-    const getUser = async () => {
-      const userData = await userService.getCurrentUser();
-      setUser(userData);
+    const loadUserData = async () => {
+      try {
+        const session = await getSession();
+        const userData = await userService.getCurrentUser();
+        // console.log("Dados do usuário:", userData);
+        setUser(userData);
+      } catch (error) {
+        console.error("Erro ao carregar dados do perfil:", error);
+        Alert.alert("Erro", "Não foi possível carregar os dados do perfil");
+      } 
     };
 
-    getUser();
+    loadUserData();
   }, []);
 
   return (
@@ -28,10 +37,9 @@ const TopBarDashboard: React.FC = () => {
       </View>
       <View>
         <Image
-          source={require('../../assets/imgs/userProfile.jpg')}
+          source={require('../../assets/imgs/profile.png')}
           style={{ width: 48, height: 48, borderRadius: 999 }}
         />
-        {/* <Ionicons name='menu' size={24} color={'white'}/> */}
       </View>
     </View>
   );

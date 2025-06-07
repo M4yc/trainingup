@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -11,13 +11,12 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Feather } from '@expo/vector-icons';
 
 import { styles } from './styles';
+import { usePersonalService } from '@/src/database/personalService';
+import { useIsFocused } from '@react-navigation/native';
 
 interface Aluno {
-  id: string;
-  nome: string;
-  objetivo: string;
-  proximoTreino: string;
-  ultimoTreino: string;
+  id: number;
+  name: string;
 }
 
 interface Card {
@@ -27,40 +26,41 @@ interface Card {
   cor: string;
 }
 
-const dadosExemplo = {
-  alunosAtivos: [
-    {
-      id: '1',
-      nome: 'João Silva',
-      objetivo: 'Hipertrofia',
-      proximoTreino: '15/03/2024',
-      ultimoTreino: '13/03/2024'
-    },
-    {
-      id: '2',
-      nome: 'Maria Santos',
-      objetivo: 'Emagrecimento',
-      proximoTreino: '14/03/2024',
-      ultimoTreino: '12/03/2024'
+export default function DashboardPersonal() {
+  const isFocused = useIsFocused();
+  const personalService = usePersonalService();
+  const [alunosPersonal, setAlunosPersonal] = useState<Aluno[]>([]);
+  
+  const carregarDados = async () => {
+    try {
+      const alunosPersonal = await personalService.getAlunosPersonal(1);
+      setAlunosPersonal(alunosPersonal);
+    } catch (error) {
+      console.error(error);
     }
-  ],
-  cards: [
+  }
+
+  useEffect(() => {
+    if (isFocused) {
+      carregarDados();
+    }
+  }, [isFocused]);
+
+  const cards = [
     {
       titulo: 'Total de Alunos',
-      valor: 25,
+      valor: alunosPersonal.length,
       icone: 'users' as keyof typeof Feather.glyphMap,
       cor: '#44BF86'
     },
     {
-      titulo: 'Treinos Hoje',
+      titulo: 'Fichas de Treino',
       valor: 8,
-      icone: 'calendar' as keyof typeof Feather.glyphMap,
+      icone: 'clipboard' as keyof typeof Feather.glyphMap,
       cor: '#00908E'
     },
-  ]
-};
+  ];
 
-export default function DashboardPersonal() {
   const renderCard = ({ item }: { item: Card }) => (
     <View style={[styles.card, { borderLeftColor: item.cor }]}>
       <Feather name={item.icone} size={24} color={item.cor} />
@@ -72,23 +72,23 @@ export default function DashboardPersonal() {
   const renderAluno = ({ item }: { item: Aluno }) => (
     <TouchableOpacity style={styles.alunoCard}>
       <View style={styles.alunoHeader}>
-        <Text style={styles.alunoNome}>{item.nome}</Text>
+        <Text style={styles.alunoNome}>{item.name}</Text>
         <Feather name="chevron-right" size={24} color="#44BF86" />
       </View>
 
       <Text style={styles.alunoObjetivo}>
-        Objetivo: <Text style={styles.alunoObjetivoValor}>{item.objetivo}</Text>
+        Objetivo: <Text style={styles.alunoObjetivoValor}>Em andamento</Text>
       </Text>
 
       <View style={styles.alunoTreinos}>
         <View style={styles.treinoInfo}>
           <Feather name="clock" size={16} color="#00908E" />
-          <Text style={styles.treinoTexto}>Último: {item.ultimoTreino}</Text>
+          <Text style={styles.treinoTexto}>Último: --/--/----</Text>
         </View>
 
         <View style={styles.treinoInfo}>
           <Feather name="calendar" size={16} color="#44BF86" />
-          <Text style={styles.treinoTexto}>Próximo: {item.proximoTreino}</Text>
+          <Text style={styles.treinoTexto}>Próximo: --/--/----</Text>
         </View>
       </View>
     </TouchableOpacity>
@@ -103,7 +103,7 @@ export default function DashboardPersonal() {
           </View>
 
           <FlatList
-            data={dadosExemplo.cards}
+            data={cards}
             renderItem={renderCard}
             horizontal
             showsHorizontalScrollIndicator={false}
@@ -112,16 +112,13 @@ export default function DashboardPersonal() {
 
           <View style={styles.section}>
             <View style={styles.sectionHeader}>
-              <Text style={styles.sectionTitle}>Próximos Treinos</Text>
-              <TouchableOpacity>
-                <Text style={styles.verTodosText}>Ver todos</Text>
-              </TouchableOpacity>
+              <Text style={styles.sectionTitle}>Alunos</Text>
             </View>
 
             <FlatList
-              data={dadosExemplo.alunosAtivos}
+              data={alunosPersonal}
               renderItem={renderAluno}
-              keyExtractor={(item) => item.id}
+              keyExtractor={(item) => item.id.toString()}
               showsVerticalScrollIndicator={false}
               scrollEnabled={false}
             />
