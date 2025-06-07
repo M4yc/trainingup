@@ -97,12 +97,6 @@ const Profile = () => {
     );
   }
 
-  const stats = [
-    { value: '45', label: 'Alunos Ativos' },
-    { value: '152', label: 'Treinos' },
-    { value: '12', label: 'Anos Exp.' }
-  ];
-
   const menuItems: MenuItem[] = [
     {
       icon: 'user',
@@ -143,17 +137,6 @@ const Profile = () => {
           </View>
 
           <View style={styles.content}>
-            {user.tipo === 'Personal' && (
-              <View style={styles.statsContainer}>
-                {stats.map((stat, index) => (
-                  <View key={index} style={styles.statItem}>
-                    <Text style={styles.statValue}>{stat.value}</Text>
-                    <Text style={styles.statLabel}>{stat.label}</Text>
-                  </View>
-                ))}
-              </View>
-            )}
-
             <Text style={styles.sectionTitle}>Menu</Text>
             <View style={styles.menuSection}>
               {menuItems.map((item, index) => (
