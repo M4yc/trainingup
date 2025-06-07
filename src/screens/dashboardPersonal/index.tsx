@@ -4,7 +4,8 @@ import {
   Text,
   ScrollView,
   TouchableOpacity,
-  FlatList
+  FlatList,
+  Alert
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -13,6 +14,8 @@ import { Feather } from '@expo/vector-icons';
 import { styles } from './styles';
 import { usePersonalService } from '@/src/database/personalService';
 import { useIsFocused } from '@react-navigation/native';
+import { useUserService, Usuario } from '@/src/service/userService';
+import { getSession } from '@/src/service/session';
 
 interface Aluno {
   id: number;
@@ -30,10 +33,20 @@ export default function DashboardPersonal() {
   const isFocused = useIsFocused();
   const personalService = usePersonalService();
   const [alunosPersonal, setAlunosPersonal] = useState<Aluno[]>([]);
+  const [user, setUser] = useState<Usuario | null>(null);
+  const userService = useUserService();
   
   const carregarDados = async () => {
     try {
-      const alunosPersonal = await personalService.getAlunosPersonal(1);
+      const session = await getSession();
+      if (!session) {
+        Alert.alert('Erro', 'Não foi possível carregar os dados do usuário');
+        return;
+      }
+      const userData = await userService.getCurrentUser();
+      setUser(userData);
+      
+      const alunosPersonal = await personalService.getAlunosPersonal(Number(userData?.id));
       setAlunosPersonal(alunosPersonal);
     } catch (error) {
       console.error(error);

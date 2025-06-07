@@ -105,6 +105,8 @@ export function CreateWorkoutPlan() {
   const [fichaExistente, setFichaExistente] = useState<FichaTreino | null>(null);
   const personalService = usePersonalService();
   const fichaTreinoService = FichaTreinoService();
+  const dataAtual = new Date();
+  const dataInicio = dataAtual.toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
 
   useEffect(() => {
     const setup = async () => {
@@ -114,9 +116,9 @@ export function CreateWorkoutPlan() {
 
         // Se estiver no modo de edição, carrega a ficha existente
         if (route.params.fichaId && route.params.modo === 'editar') {
-          console.log('Carregando ficha para edição:', route.params.fichaId);
+          // console.log('Carregando ficha para edição:', route.params.fichaId);
           const fichaCompleta = await fichaTreinoService.getFichaCompleta(Number(route.params.fichaId));
-          console.log('Ficha carregada:', JSON.stringify(fichaCompleta, null, 2));
+          // console.log('Ficha carregada:', JSON.stringify(fichaCompleta, null, 2));
           
           if (fichaCompleta) {
             // Formata as datas para o formato DD/MM/AAAA
@@ -148,7 +150,7 @@ export function CreateWorkoutPlan() {
               }))
             };
 
-            console.log('Ficha formatada para o formulário:', JSON.stringify(fichaFormatada, null, 2));
+            // console.log('Ficha formatada para o formulário:', JSON.stringify(fichaFormatada, null, 2));
             setFichaExistente(fichaFormatada);
             setSelectedAlunoId(fichaCompleta.ficha.aluno_id.toString());
           }
@@ -166,7 +168,7 @@ export function CreateWorkoutPlan() {
     id: 0,
     aluno_id: 0,
     personal_id: 0,
-    data_inicio: '',
+    data_inicio: dataInicio,
     data_fim: '',
     grupos: [
       {
@@ -189,7 +191,7 @@ export function CreateWorkoutPlan() {
     ]
   };
 
-  console.log('Valores iniciais do formulário:', JSON.stringify(valoresIniciais, null, 2));
+  //console.log('Valores iniciais do formulário:', JSON.stringify(valoresIniciais, null, 2));
 
   const renderExercicio = (
     exercicio: Exercicio,

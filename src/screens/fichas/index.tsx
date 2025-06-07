@@ -19,6 +19,8 @@ import { styles } from './styles';
 import { FichaTreinoService, FichaTreino } from '@/src/service/fichaTreinoService';
 import { usePersonalService } from '@/src/database/personalService';
 import { useIsFocused } from '@react-navigation/native';
+import { useUserService, Usuario } from '@/src/service/userService';
+import { getSession } from '@/src/service/session';
 
 type RootStackParamList = {
   FichasAlunos: undefined;
@@ -54,7 +56,10 @@ export default function FichasAlunosScreen() {
   const personalService = usePersonalService();
   const fichaTreinoService = FichaTreinoService();
   const isFocused = useIsFocused();
+  const [user, setUser] = useState<Usuario | null>(null);
+  const userService = useUserService();
 
+  
   const formatarData = (data: string) => {
     if (!data) return '';
     try {
@@ -69,10 +74,26 @@ export default function FichasAlunosScreen() {
     }
   };
 
+  useEffect(() => {
+    const loadUserData = async () => {
+      try {
+        const session = await getSession();
+        const userData = await userService.getCurrentUser();
+        console.log("Dados do usuário:", userData);
+        setUser(userData);
+      } catch (error) {
+        console.error("Erro ao carregar dados do perfil:", error);
+        Alert.alert("Erro", "Não foi possível carregar os dados do perfil");
+      } 
+    };
+
+    loadUserData();
+  }, []);
+  
   const carregarFichas = async () => {
     try {
-      const fichasPersonal = await fichaTreinoService.getFichasByPersonal(1);
-      const alunosPersonal = await personalService.getAlunosPersonal(1);
+      const fichasPersonal = await fichaTreinoService.getFichasByPersonal(Number(user?.id));
+      const alunosPersonal = await personalService.getAlunosPersonal(Number(user?.id));
       
       // Mapear as fichas com os nomes dos alunos
       const fichasComAlunos = fichasPersonal.map(ficha => {
