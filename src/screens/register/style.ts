@@ -43,20 +43,20 @@ const styles = StyleSheet.create({
     height: 44,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: '#4be381',
+    borderColor: '#44BF86',
     justifyContent: 'center',
     alignItems: 'center'
   },
   userTypeButtonActive: {
-    backgroundColor: '#4be381'
+    backgroundColor: '#44BF86'
   },
   userTypeText: {
-    color: '#4be381',
+    color: '#44BF86',
     fontSize: 16,
     fontWeight: '500'
   },
   userTypeTextActive: {
-    color: '#000'
+    color: '#fff'
   },
   loginLink: {
     marginTop: 16,
