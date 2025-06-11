@@ -21,6 +21,7 @@ import { mascaraData } from '@/src/utils/maskUtils';
 
 import { usePersonalService } from '@/src/database/personalService';
 import { FichaTreinoService } from '@/src/service/fichaTreinoService';
+import { useUserService, Usuario } from '@/src/service/userService';
 
 type RootStackParamList = {
   CreateWorkoutPlan: {
@@ -107,11 +108,15 @@ export function CreateWorkoutPlan() {
   const fichaTreinoService = FichaTreinoService();
   const dataAtual = new Date();
   const dataInicio = dataAtual.toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
-
+  const userService = useUserService();
+  const [user, setUser] = useState<Usuario | null>(null);
+  
   useEffect(() => {
     const setup = async () => {
       try {
-        const alunos = await personalService.getAlunosPersonal(1);
+        const userData = await userService.getCurrentUser();
+        setUser(userData);
+        const alunos = await personalService.getAlunosPersonal(Number(userData?.id));
         setAlunos(alunos);
 
         // Se estiver no modo de edição, carrega a ficha existente
