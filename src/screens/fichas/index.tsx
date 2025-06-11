@@ -74,26 +74,29 @@ export default function FichasAlunosScreen() {
     }
   };
 
-  useEffect(() => {
-    const loadUserData = async () => {
-      try {
-        const session = await getSession();
-        const userData = await userService.getCurrentUser();
-        console.log("Dados do usuário:", userData);
-        setUser(userData);
-      } catch (error) {
-        console.error("Erro ao carregar dados do perfil:", error);
-        Alert.alert("Erro", "Não foi possível carregar os dados do perfil");
-      } 
-    };
+  // useEffect(() => {
+  //   const loadUserData = async () => {
+  //     try {
+  //       const session = await getSession();
+  //       const userData = await userService.getCurrentUser();
+  //       setUser(userData);
+  //       console.log("Dados do usuário:", userData);
+  //     } catch (error) {
+  //       console.error("Erro ao carregar dados do perfil:", error);
+  //       Alert.alert("Erro", "Não foi possível carregar os dados do perfil");
+  //     } 
+  //   };
 
-    loadUserData();
-  }, []);
+  //   loadUserData();
+  // }, []);
   
   const carregarFichas = async () => {
     try {
-      const fichasPersonal = await fichaTreinoService.getFichasByPersonal(Number(user?.id));
-      const alunosPersonal = await personalService.getAlunosPersonal(Number(user?.id));
+      const userData = await userService.getCurrentUser();
+      setUser(userData);
+      console.log("Dados do usuário:", userData);
+      const fichasPersonal = await fichaTreinoService.getFichasByPersonal(Number(userData?.id));
+      const alunosPersonal = await personalService.getAlunosPersonal(Number(userData?.id));
       
       // Mapear as fichas com os nomes dos alunos
       const fichasComAlunos = fichasPersonal.map(ficha => {

@@ -115,7 +115,7 @@ export function useUserDatabase(){
 
   async function getAllPersonal() {
     try {
-      const query = "SELECT id, name FROM usuarios WHERE tipo = 'Personal'"
+      const query = "SELECT id, name, email FROM usuarios WHERE tipo = 'Personal'"
 
       const response = await database.getAllAsync<UserDatabase>(query)
 
