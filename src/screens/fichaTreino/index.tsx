@@ -142,28 +142,28 @@ const FichaTreinoScreen = () => {
                     <View style={{ flex: 1 }}>
                       <Text style={styles.cardTitle}>Ficha de treino</Text>
                       <View
-                        style={{ flexDirection: 'row', gap: 10, marginTop: 4 }}
+                        style={{
+                          flexDirection: 'row',
+                          gap: 10,
+                          marginTop: 4,
+                          justifyContent: 'space-between'
+                        }}
                       >
                         <Text style={styles.cardSubtitle}>
                           📅 {formatarData(ficha.data_inicio)} -{' '}
                           {formatarData(ficha.data_fim)}
                         </Text>
                         <Text style={styles.cardSubtitle}>
-                          🔢 {getTotalExercicios(ficha)} exercícios
+                          🏋️‍♂️ {getTotalExercicios(ficha)} exercícios
                         </Text>
                       </View>
                       <MaterialIcons
                         name={isExpanded ? 'expand-less' : 'expand-more'}
                         size={24}
-                        color="#333"
+                        color="#fff"
                       />
                     </View>
                   </View>
-                  <Text style={styles.cardSubtitle}>
-                    {getTotalExercicios(ficha)} exercícios •{' '}
-                    {formatarData(ficha.data_inicio)} até{' '}
-                    {formatarData(ficha.data_fim)}
-                  </Text>
                 </TouchableOpacity>
 
                 {isExpanded && (
