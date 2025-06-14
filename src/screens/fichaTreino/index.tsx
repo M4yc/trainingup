@@ -139,14 +139,25 @@ const FichaTreinoScreen = () => {
               <View key={ficha.id} style={styles.card}>
                 <TouchableOpacity onPress={() => toggleExpand(ficha.id)}>
                   <View style={styles.cardHeader}>
-                    <Text style={styles.cardTitle}>
-                      Ficha de Treino {ficha.id}
-                    </Text>
-                    <MaterialIcons
-                      name={isExpanded ? 'expand-less' : 'expand-more'}
-                      size={24}
-                      color="#333"
-                    />
+                    <View style={{ flex: 1 }}>
+                      <Text style={styles.cardTitle}>Ficha de treino</Text>
+                      <View
+                        style={{ flexDirection: 'row', gap: 10, marginTop: 4 }}
+                      >
+                        <Text style={styles.cardSubtitle}>
+                          📅 {formatarData(ficha.data_inicio)} -{' '}
+                          {formatarData(ficha.data_fim)}
+                        </Text>
+                        <Text style={styles.cardSubtitle}>
+                          🔢 {getTotalExercicios(ficha)} exercícios
+                        </Text>
+                      </View>
+                      <MaterialIcons
+                        name={isExpanded ? 'expand-less' : 'expand-more'}
+                        size={24}
+                        color="#333"
+                      />
+                    </View>
                   </View>
                   <Text style={styles.cardSubtitle}>
                     {getTotalExercicios(ficha)} exercícios •{' '}
@@ -159,13 +170,50 @@ const FichaTreinoScreen = () => {
                   <View style={styles.cardContent}>
                     {ficha.grupos.map((grupo: any, idx: number) => (
                       <View key={idx} style={styles.group}>
-                        <Text style={styles.groupTitle}>{grupo.nome}</Text>
+                        <Text style={styles.groupTitle}>
+                          {' '}
+                          Ficha {grupo.nome} - / Musculo alvo /
+                        </Text>
                         {grupo.exercicios.map((ex: any, i: number) => (
                           <TouchableOpacity
                             key={i}
+                            style={styles.exerciseBlock}
                             onPress={() => abrirDetalheExercicio(ex)}
                           >
-                            <Text style={styles.exerciseItem}>• {ex.nome}</Text>
+                            <Text style={styles.exerciseItem}>{ex.nome}</Text>
+
+                            <View style={styles.exerciseInfoRow}>
+                              <View style={styles.infoItem}>
+                                <MaterialIcons
+                                  name="fitness-center"
+                                  size={16}
+                                  color="#ccc"
+                                />
+                                <Text style={styles.exerciseInfo}>
+                                  Séries: {ex.series || '-'}
+                                </Text>
+                              </View>
+                              <View style={styles.infoItem}>
+                                <MaterialIcons
+                                  name="repeat"
+                                  size={16}
+                                  color="#ccc"
+                                />
+                                <Text style={styles.exerciseInfo}>
+                                  Reps: {ex.repeticoes || '-'}
+                                </Text>
+                              </View>
+                              <View style={styles.infoItem}>
+                                <MaterialIcons
+                                  name="timer"
+                                  size={16}
+                                  color="#ccc"
+                                />
+                                <Text style={styles.exerciseInfo}>
+                                  Interv: {ex.intervalo}s
+                                </Text>
+                              </View>
+                            </View>
                           </TouchableOpacity>
                         ))}
                       </View>
