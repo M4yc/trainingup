@@ -5,34 +5,45 @@ import Colors from '@constants/colors';
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#1a1a1a',
-    paddingHorizontal: 16,
-    paddingTop: 20
+    backgroundColor: '#211d28'
+  },
+  headerContainer: {
+    marginBottom: 20,
+    paddingTop: 20,
+    paddingBottom: 24,
+    paddingHorizontal: 20,
+    borderBottomLeftRadius: 20,
+    borderBottomRightRadius: 20
+  },
+  subtitle: {
+    fontSize: 16,
+    color: '#cfcfcf',
+    textAlign: 'center'
   },
   linha: {
     width: '100%',
     height: 2,
-    backgroundColor: '#00908E',
+    backgroundColor: '#44bf86',
     marginVertical: 10,
     borderRadius: 4
   },
   header: {
-    fontSize: 22,
+    fontSize: 26,
     fontWeight: 'bold',
     color: '#fff',
     textAlign: 'center',
-    marginBottom: 10
+    marginBottom: 4
   },
   card: {
-    backgroundColor: '#211d28',
-    padding: 14,
-    borderRadius: 12,
+    backgroundColor: '#2b2836',
+    padding: 20,
+    borderRadius: 16,
     marginBottom: 16,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
+    shadowOpacity: 0.15,
     shadowRadius: 4,
-    elevation: 3
+    elevation: 4
   },
   name: {
     color: '#fff',
@@ -44,59 +55,54 @@ const styles = StyleSheet.create({
   infoRow: {
     flexDirection: 'row',
     alignItems: 'center',
+    gap: 6,
     marginVertical: 4
   },
   infoText: {
     color: '#ccc',
-    fontSize: 16,
-    marginLeft: 8
+    fontSize: 14,
+    marginLeft: 4
   },
   cardText: {
     color: '#fff',
-    fontSize: 16,
-    textAlign: 'center',
-    marginBottom: 20
-  },
-  exercicioBox: {
-    backgroundColor: '#1a1a1a',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 20
-  },
-  exercicioNome: {
-    color: '#fff',
-    fontSize: 22,
+    fontSize: 20,
     fontWeight: 'bold',
     textAlign: 'center',
     marginBottom: 10
   },
-  descricaoTitulo: {
+  exercicioBox: {
+    marginTop: 16
+  },
+  exercicioNome: {
     color: '#fff',
     fontSize: 18,
-    marginBottom: 10,
+    fontWeight: '600',
+    textAlign: 'center',
+    marginBottom: 8
+  },
+  descricaoTitulo: {
+    color: '#fff',
+    fontSize: 16,
+    marginBottom: 4,
     marginLeft: 5
   },
   descricaoLista: {
-    marginLeft: 10,
-    marginBottom: 3
+    paddingLeft: 8
   },
   descricaoItem: {
-    color: '#fff',
-    fontSize: 16,
-    lineHeight: 22
+    color: '#ccc',
+    fontSize: 14,
+    lineHeight: 20
   },
   imagemExercicio: {
-    marginTop: 150,
+    marginTop: 16,
     width: '100%',
-    height: 250,
-    resizeMode: 'cover',
-    borderRadius: 10,
-    marginBottom: 20,
-    padding: 10,
-    marginRight: 20
+    height: 200,
+    borderRadius: 12,
+    resizeMode: 'cover'
   },
   botaoVoltar: {
-    marginTop: 10,
+    marginTop: 24,
     backgroundColor: '#00908E',
     paddingVertical: 12,
     paddingHorizontal: 24,
@@ -108,6 +114,33 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
     color: '#fff'
+  },
+  infoGroup: {
+    marginTop: 10,
+    marginBottom: 12,
+    gap: 6
+  },
+  musculoAlvoText: {
+    color: '#ccc',
+    fontSize: 14,
+    textAlign: 'center',
+    marginBottom: 12
+  },
+  videoPlaceholder: {
+    marginTop: 16,
+    width: '100%',
+    height: 200,
+    borderRadius: 12,
+    borderWidth: 2,
+    borderColor: '#555',
+    backgroundColor: '#1e1e2e',
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
+  videoPlaceholderText: {
+    color: '#888',
+    fontSize: 14,
+    marginTop: 8
   }
 });
 
