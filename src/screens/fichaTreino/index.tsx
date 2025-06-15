@@ -10,6 +10,13 @@ import {
   UIManager
 } from 'react-native';
 
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withTiming
+} from 'react-native-reanimated';
+import { FadeInUp } from 'react-native-reanimated';
+
 import Layout from '@components/layout';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { useNavigation } from '@react-navigation/native';
@@ -41,6 +48,14 @@ const FichaTreinoScreen = () => {
   const [user, setUser] = useState<Usuario | null>(null);
   const fichaService = FichaTreinoService();
   const userService = useUserService();
+
+  const rotateArrow = useSharedValue(0);
+
+  const arrowStyle = useAnimatedStyle(() => {
+    return {
+      transform: [{ rotate: `${rotateArrow.value}deg` }]
+    };
+  });
 
   useEffect(() => {
     const loadUserData = async () => {
@@ -110,6 +125,9 @@ const FichaTreinoScreen = () => {
 
   const toggleExpand = (id: number) => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+    rotateArrow.value = withTiming(expandedId === id ? 0 : 180, {
+      duration: 300
+    });
     setExpandedId(expandedId === id ? null : id);
   };
 
@@ -164,16 +182,19 @@ const FichaTreinoScreen = () => {
                           🏋️‍♂️ {getTotalExercicios(ficha)} exercícios
                         </Text>
                       </View>
-                      <View style={styles.expandIconContainer}>
-                        <MaterialIcons
-                          name={isExpanded ? 'expand-less' : 'expand-more'}
-                          size={28}
-                          color="#44BF86"
-                        />
-                      </View>
                     </View>
                   </View>
                 </TouchableOpacity>
+
+                <View style={{ alignItems: 'center', marginTop: 8 }}>
+                  <Animated.View style={arrowStyle}>
+                    <MaterialIcons
+                      name={isExpanded ? 'expand-less' : 'expand-more'}
+                      size={28}
+                      color="#44BF86"
+                    />
+                  </Animated.View>
+                </View>
 
                 {isExpanded && (
                   <View style={styles.cardContent}>
@@ -184,46 +205,51 @@ const FichaTreinoScreen = () => {
                           Ficha {grupo.nome} - musc
                         </Text>
                         {grupo.exercicios.map((ex: any, i: number) => (
-                          <TouchableOpacity
+                          <Animated.View
                             key={i}
-                            style={styles.exerciseBlock}
-                            onPress={() => abrirDetalheExercicio(ex)}
+                            entering={FadeInUp.duration(400).delay(i * 100)}
                           >
-                            <Text style={styles.exerciseItem}>{ex.nome}</Text>
+                            <TouchableOpacity
+                              key={i}
+                              style={styles.exerciseBlock}
+                              onPress={() => abrirDetalheExercicio(ex)}
+                            >
+                              <Text style={styles.exerciseItem}>{ex.nome}</Text>
 
-                            <View style={styles.exerciseInfoRow}>
-                              <View style={styles.infoItem}>
-                                <MaterialIcons
-                                  name="fitness-center"
-                                  size={16}
-                                  color="#ccc"
-                                />
-                                <Text style={styles.exerciseInfo}>
-                                  Séries: {ex.series || '-'}
-                                </Text>
+                              <View style={styles.exerciseInfoRow}>
+                                <View style={styles.infoItem}>
+                                  <MaterialIcons
+                                    name="fitness-center"
+                                    size={16}
+                                    color="#ccc"
+                                  />
+                                  <Text style={styles.exerciseInfo}>
+                                    Séries: {ex.series || '-'}
+                                  </Text>
+                                </View>
+                                <View style={styles.infoItem}>
+                                  <MaterialIcons
+                                    name="repeat"
+                                    size={16}
+                                    color="#ccc"
+                                  />
+                                  <Text style={styles.exerciseInfo}>
+                                    Reps: {ex.repeticoes || '-'}
+                                  </Text>
+                                </View>
+                                <View style={styles.infoItem}>
+                                  <MaterialIcons
+                                    name="timer"
+                                    size={16}
+                                    color="#ccc"
+                                  />
+                                  <Text style={styles.exerciseInfo}>
+                                    Interv: {ex.intervalo}s
+                                  </Text>
+                                </View>
                               </View>
-                              <View style={styles.infoItem}>
-                                <MaterialIcons
-                                  name="repeat"
-                                  size={16}
-                                  color="#ccc"
-                                />
-                                <Text style={styles.exerciseInfo}>
-                                  Reps: {ex.repeticoes || '-'}
-                                </Text>
-                              </View>
-                              <View style={styles.infoItem}>
-                                <MaterialIcons
-                                  name="timer"
-                                  size={16}
-                                  color="#ccc"
-                                />
-                                <Text style={styles.exerciseInfo}>
-                                  Interv: {ex.intervalo}s
-                                </Text>
-                              </View>
-                            </View>
-                          </TouchableOpacity>
+                            </TouchableOpacity>
+                          </Animated.View>
                         ))}
                       </View>
                     ))}
