@@ -15,6 +15,8 @@ import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { AppStackParamList } from 'src/routes/types';
+import { LinearGradient } from 'expo-linear-gradient';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 import styles from './style';
 
@@ -117,12 +119,17 @@ const FichaTreinoScreen = () => {
 
   return (
     <Layout>
-      <View style={styles.header}>
+      <LinearGradient
+        colors={['#2c2a37', '#211d28']}
+        style={styles.header}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 0 }}
+      >
         <Text style={styles.title}>Fichas de Treino</Text>
         <Text style={styles.subtitle}>
           Selecione uma ficha de treino para abrir
         </Text>
-      </View>
+      </LinearGradient>
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         {loading ? (
@@ -157,11 +164,13 @@ const FichaTreinoScreen = () => {
                           🏋️‍♂️ {getTotalExercicios(ficha)} exercícios
                         </Text>
                       </View>
-                      <MaterialIcons
-                        name={isExpanded ? 'expand-less' : 'expand-more'}
-                        size={24}
-                        color="#fff"
-                      />
+                      <View style={styles.expandIconContainer}>
+                        <MaterialIcons
+                          name={isExpanded ? 'expand-less' : 'expand-more'}
+                          size={28}
+                          color="#44BF86"
+                        />
+                      </View>
                     </View>
                   </View>
                 </TouchableOpacity>
@@ -172,7 +181,7 @@ const FichaTreinoScreen = () => {
                       <View key={idx} style={styles.group}>
                         <Text style={styles.groupTitle}>
                           {' '}
-                          Ficha {grupo.nome} - / Musculo alvo /
+                          Ficha {grupo.nome} - musc
                         </Text>
                         {grupo.exercicios.map((ex: any, i: number) => (
                           <TouchableOpacity
