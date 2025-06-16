@@ -4,8 +4,7 @@ import Colors from '@constants/colors';
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    backgroundColor: '#211d28'
+    flex: 1
   },
   headerContainer: {
     marginBottom: 20,
@@ -30,7 +29,7 @@ const styles = StyleSheet.create({
   header: {
     fontSize: 26,
     fontWeight: 'bold',
-    color: '#fff',
+    color: '#44bf86',
     textAlign: 'center',
     marginBottom: 4
   },
@@ -80,12 +79,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginBottom: 8
   },
-  descricaoTitulo: {
-    color: '#fff',
-    fontSize: 16,
-    marginBottom: 4,
-    marginLeft: 5
-  },
+
   descricaoLista: {
     paddingLeft: 8
   },

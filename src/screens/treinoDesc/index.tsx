@@ -60,10 +60,7 @@ export default function DetalhesExercício() {
               <View style={styles.linha} />
 
               <View style={styles.exercicioBox}>
-                <Text style={styles.exercicioNome}>
-                  Exercício #{exercicio.numero || '-'}
-                </Text>
-                <Text style={styles.descricaoTitulo}>Descrição:</Text>
+                <Text style={styles.exercicioNome}>Descrição:</Text>
                 <View style={styles.descricaoLista}>
                   <Text style={styles.descricaoItem}>
                     {exercicio.descricao}
