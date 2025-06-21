@@ -41,9 +41,11 @@ npm install
 #Execute o projeto
 npm start
 ```
+2. Pressione a tecla s
+3. Agora instale o App do ExpoGo (sdk 52) e escaneie o QR code
 
-2. Agora baixe o App do ExpoGo e escaneie o QR code.
-
+> [!NOTE]
+> O APK do Expo Go (sdk 52) está disponivel no link [ExpoGo](https://d1ahtucjixef4r.cloudfront.net/Exponent-2.32.19.apk)
 
 ## 🤝 Colaboradores do projeto
 
