@@ -108,7 +108,7 @@ const FichaTreinoScreen = () => {
   const formatarData = (data: string) => {
     if (!data) return '';
     try {
-      console.log('Data recebidapara formatação: ', data);
+      //console.log('Data recebidapara formatação: ', data);
       if (data.includes('-')) {
         const [ano, mes, dia] = data.split('-');
         return '${dia}/${mes}/${ano}';

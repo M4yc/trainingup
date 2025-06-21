@@ -6,7 +6,7 @@ export function FichaTreinoService() {
 
   async function getFichasByAluno(id_aluno: number): Promise<FichaTreino[]> {
     try {
-      console.log('Buscando fichas para o aluno:', id_aluno);
+      //console.log('Buscando fichas para o aluno:', id_aluno);
       
       // Primeiro, vamos verificar se a tabela existe
       const tables = await db.getAllAsync(
@@ -24,7 +24,7 @@ export function FichaTreinoService() {
         [id_aluno]
       );
       
-      console.log('Fichas encontradas:', fichas);
+      //console.log('Fichas encontradas:', fichas);
 
       if (!fichas || fichas.length === 0) {
         console.log('Nenhuma ficha encontrada para o aluno');
@@ -33,31 +33,31 @@ export function FichaTreinoService() {
   
       const fichasComGruposEExercicios = await Promise.all(
         fichas.map(async (ficha) => {
-          console.log('Dados da ficha:', {
-            id: ficha.id,
-            data_inicio: ficha.data_inicio,
-            data_fim: ficha.data_fim
-          });
+          // console.log('Dados da ficha:', {
+          //   id: ficha.id,
+          //   data_inicio: ficha.data_inicio,
+          //   data_fim: ficha.data_fim
+          // });
           
-          console.log('Buscando grupos para a ficha:', ficha.id);
+         //console.log('Buscando grupos para a ficha:', ficha.id);
           
           const grupos = await db.getAllAsync<GrupoTreino>(
             `SELECT * FROM grupos_treino WHERE ficha_id = ?`,
             [ficha.id]
           );
           
-          console.log('Grupos encontrados:', grupos);
+          //console.log('Grupos encontrados:', grupos);
   
           const gruposComExercicios = await Promise.all(
             grupos.map(async (grupo) => {
-              console.log('Buscando exercícios para o grupo:', grupo.id);
+              //console.log('Buscando exercícios para o grupo:', grupo.id);
               
               const exercicios = await db.getAllAsync<Exercicio>(
                 `SELECT * FROM exercicios WHERE grupo_id = ?`,
                 [grupo.id]
               );
               
-              console.log('Exercícios encontrados:', exercicios);
+              //console.log('Exercícios encontrados:', exercicios);
               
               return { ...grupo, exercicios } as GrupoTreino & { exercicios: Exercicio[] };
             })
@@ -67,7 +67,7 @@ export function FichaTreinoService() {
         })
       );
   
-      console.log('Fichas completas:', fichasComGruposEExercicios);
+      //console.log('Fichas completas:', fichasComGruposEExercicios);
       return fichasComGruposEExercicios;
     } catch (error) {
       console.error('Erro ao buscar fichas:', error);
