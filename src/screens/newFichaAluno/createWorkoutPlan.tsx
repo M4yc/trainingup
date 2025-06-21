@@ -95,7 +95,7 @@ interface ExercicioInput {
 
 type Aluno = {
   id: number;
-  name: string;  
+  name: string;
 };
 
 export function CreateWorkoutPlan() {
@@ -110,7 +110,7 @@ export function CreateWorkoutPlan() {
   const dataInicio = dataAtual.toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
   const userService = useUserService();
   const [user, setUser] = useState<Usuario | null>(null);
-  
+
   useEffect(() => {
     const setup = async () => {
       try {
@@ -124,9 +124,9 @@ export function CreateWorkoutPlan() {
           // console.log('Carregando ficha para edição:', route.params.fichaId);
           const fichaCompleta = await fichaTreinoService.getFichaCompleta(Number(route.params.fichaId));
           // console.log('Ficha carregada:', JSON.stringify(fichaCompleta, null, 2));
-          
+
           if (fichaCompleta) {
-            // Formata as datas para o formato DD/MM/AAAA
+
             const dataInicio = fichaCompleta.ficha.data_inicio.split('-').reverse().join('/');
             const dataFim = fichaCompleta.ficha.data_fim.split('-').reverse().join('/');
 
@@ -165,7 +165,7 @@ export function CreateWorkoutPlan() {
         Alert.alert('Erro', 'Não foi possível carregar os dados da ficha');
       }
     };
-  
+
     setup();
   }, []);
 
@@ -224,7 +224,7 @@ export function CreateWorkoutPlan() {
           </TouchableOpacity>
         )}
       </View>
-      
+
       <TextInput
         style={styles.input}
         onChangeText={handleChange(`grupos.${grupoIndex}.exercicios.${exercicioIndex}.nome`)}
@@ -240,6 +240,15 @@ export function CreateWorkoutPlan() {
         onBlur={handleBlur(`grupos.${grupoIndex}.exercicios.${exercicioIndex}.descricao`)}
         value={exercicio.descricao}
         placeholder="Descrição do exercício"
+        placeholderTextColor={Colors.bordas}
+      />
+
+      <TextInput
+        style={styles.input}
+        onChangeText={handleChange(`grupos.${grupoIndex}.exercicios.${exercicioIndex}.imagem`)}
+        onBlur={handleBlur(`grupos.${grupoIndex}.exercicios.${exercicioIndex}.imagem`)}
+        value={exercicio.imagem}
+        placeholder="Link do video"
         placeholderTextColor={Colors.bordas}
       />
 
@@ -317,11 +326,11 @@ export function CreateWorkoutPlan() {
       if (route.params.modo === 'editar' && route.params.fichaId) {
         // Modo de edição
         const fichaId = Number(route.params.fichaId);
-        
+
         // Converte as datas de volta para o formato YYYY-MM-DD
         const dataInicio = values.data_inicio.split('/').reverse().join('-');
         const dataFim = values.data_fim.split('/').reverse().join('-');
-        
+
         // Atualiza a ficha
         await fichaTreinoService.editarFicha({
           id: fichaId,
@@ -405,7 +414,7 @@ export function CreateWorkoutPlan() {
         };
 
         const fichaId = await fichaTreinoService.inserirFichaTreino(fichaInput);
-        
+
         if (fichaId) {
           for (const grupo of values.grupos) {
             const grupoInput: GrupoTreinoInput = {
@@ -415,7 +424,7 @@ export function CreateWorkoutPlan() {
             };
 
             const grupoId = await fichaTreinoService.inserirGrupo(grupoInput);
-          
+
             if (grupoId) {
               for (const exercicio of grupo.exercicios) {
                 const exercicioInput: ExercicioInput = {
@@ -441,38 +450,39 @@ export function CreateWorkoutPlan() {
       return false;
     }
   }
+
   const verFicha = async () => {
 
     const fichas = await fichaTreinoService.getFichaCompleta(1);
-    console.log('Fichas: ', fichas);
+    //console.log('Fichas: ', fichas);
   }
 
   const formatarErro = (key: string, error: any): string => {
     if (typeof error === 'string') {
       return error;
     }
-    
+
     if (Array.isArray(error)) {
       return error.map(e => formatarErro(key, e)).join(', ');
     }
-    
+
     if (typeof error === 'object' && error !== null) {
       return Object.entries(error)
         .map(([subKey, subError]) => {
           const campo = subKey === 'nome' ? 'Nome' :
-                       subKey === 'foco' ? 'Foco' :
-                       subKey === 'exercicios' ? 'Exercícios' :
-                       subKey === 'series' ? 'Séries' :
-                       subKey === 'repeticoes' ? 'Repetições' :
-                       subKey === 'peso' ? 'Peso' :
-                       subKey === 'intervalo' ? 'Intervalo' :
-                       subKey;
-          
+            subKey === 'foco' ? 'Foco' :
+              subKey === 'exercicios' ? 'Exercícios' :
+                subKey === 'series' ? 'Séries' :
+                  subKey === 'repeticoes' ? 'Repetições' :
+                    subKey === 'peso' ? 'Peso' :
+                      subKey === 'intervalo' ? 'Intervalo' :
+                        subKey;
+
           return `${campo}: ${formatarErro(subKey, subError)}`;
         })
         .join(', ');
     }
-    
+
     return String(error);
   };
 
@@ -480,7 +490,7 @@ export function CreateWorkoutPlan() {
     <View style={styles.container}>
       <SafeAreaView edges={['top']} style={{ flex: 1 }}>
         <View style={styles.header}>
-          <TouchableOpacity 
+          <TouchableOpacity
             onPress={() => navigation.goBack()}
             style={styles.backButton}
           >
@@ -504,14 +514,14 @@ export function CreateWorkoutPlan() {
                 }
 
                 const sucesso = await salvarFicha(values);
-                
+
                 if (sucesso) {
                   Alert.alert('Sucesso', 'Ficha salva com sucesso!');
                   navigation.goBack();
                 } else {
                   Alert.alert('Erro', 'Não foi possível salvar a ficha');
                 }
-              } catch(error) {
+              } catch (error) {
                 console.error('Erro ao salvar ficha:', error);
                 Alert.alert('Erro', 'Ocorreu um erro ao salvar a ficha');
               } finally {
@@ -530,12 +540,12 @@ export function CreateWorkoutPlan() {
               setFieldValue,
               validateForm
             }) => {
-              console.log('Valores atuais do formulário:', JSON.stringify(values, null, 2));
+              //console.log('Valores atuais do formulário:', JSON.stringify(values, null, 2));
               return (
                 <View style={styles.form}>
                   <View style={styles.section}>
                     <Text style={styles.sectionTitle}>Informações Gerais</Text>
-                    
+
                     <View style={styles.inputContainer}>
                       <Text style={styles.label}>Nome do Aluno</Text>
                       <Select
@@ -595,7 +605,7 @@ export function CreateWorkoutPlan() {
                   {values.grupos.map((grupo, grupoIndex) => (
                     <View key={grupoIndex} style={styles.groupSection}>
                       <View style={styles.groupHeader}>
-                        
+
                         {grupoIndex > 0 && (
                           <TouchableOpacity
                             onPress={() => {
@@ -691,10 +701,10 @@ export function CreateWorkoutPlan() {
                   <TouchableOpacity
                     style={styles.submitButton}
                     onPress={async () => {
-                      console.log('Botão de submit pressionado');
+                      //console.log('Botão de submit pressionado');
                       const validationErrors = await validateForm();
-                      console.log('Erros de validação:', validationErrors);
-                      
+                      //console.log('Erros de validação:', validationErrors);
+
                       if (Object.keys(validationErrors).length === 0) {
                         handleSubmit();
                       } else {

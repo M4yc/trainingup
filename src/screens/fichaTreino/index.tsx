@@ -108,10 +108,10 @@ const FichaTreinoScreen = () => {
   const formatarData = (data: string) => {
     if (!data) return '';
     try {
-      //console.log('Data recebidapara formatação: ', data);
       if (data.includes('-')) {
         const [ano, mes, dia] = data.split('-');
-        return '${dia}/${mes}/${ano}';
+
+        return `${dia}/${mes}/${ano}`;
       }
       if (data.includes('/')) {
         return data;
@@ -175,7 +175,7 @@ const FichaTreinoScreen = () => {
                         }}
                       >
                         <Text style={styles.cardSubtitle}>
-                          📅 {formatarData(ficha.data_inicio)} -{' '}
+                          📅 {formatarData(ficha.data_inicio)} - {' '}
                           {formatarData(ficha.data_fim)}
                         </Text>
                         <Text style={styles.cardSubtitle}>
@@ -184,17 +184,16 @@ const FichaTreinoScreen = () => {
                       </View>
                     </View>
                   </View>
+                  <View style={{ alignItems: 'center', marginTop: 8 }}>
+                    <Animated.View style={arrowStyle}>
+                      <MaterialIcons
+                        name={isExpanded ? 'expand-less' : 'expand-more'}
+                        size={28}
+                        color="#44BF86"
+                      />
+                    </Animated.View>
+                  </View>
                 </TouchableOpacity>
-
-                <View style={{ alignItems: 'center', marginTop: 8 }}>
-                  <Animated.View style={arrowStyle}>
-                    <MaterialIcons
-                      name={isExpanded ? 'expand-less' : 'expand-more'}
-                      size={28}
-                      color="#44BF86"
-                    />
-                  </Animated.View>
-                </View>
 
                 {isExpanded && (
                   <View style={styles.cardContent}>

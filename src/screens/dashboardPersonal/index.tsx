@@ -35,7 +35,7 @@ export default function DashboardPersonal() {
   const [alunosPersonal, setAlunosPersonal] = useState<Aluno[]>([]);
   const [user, setUser] = useState<Usuario | null>(null);
   const userService = useUserService();
-  
+
   const carregarDados = async () => {
     try {
       const session = await getSession();
@@ -45,7 +45,7 @@ export default function DashboardPersonal() {
       }
       const userData = await userService.getCurrentUser();
       setUser(userData);
-      
+
       const alunosPersonal = await personalService.getAlunosPersonal(Number(userData?.id));
       setAlunosPersonal(alunosPersonal);
     } catch (error) {
@@ -65,13 +65,7 @@ export default function DashboardPersonal() {
       valor: alunosPersonal.length,
       icone: 'users' as keyof typeof Feather.glyphMap,
       cor: '#44BF86'
-    },
-    {
-      titulo: 'Fichas de Treino',
-      valor: 8,
-      icone: 'clipboard' as keyof typeof Feather.glyphMap,
-      cor: '#00908E'
-    },
+    }
   ];
 
   const renderCard = ({ item }: { item: Card }) => (
@@ -86,23 +80,6 @@ export default function DashboardPersonal() {
     <TouchableOpacity style={styles.alunoCard}>
       <View style={styles.alunoHeader}>
         <Text style={styles.alunoNome}>{item.name}</Text>
-        <Feather name="chevron-right" size={24} color="#44BF86" />
-      </View>
-
-      <Text style={styles.alunoObjetivo}>
-        Objetivo: <Text style={styles.alunoObjetivoValor}>Em andamento</Text>
-      </Text>
-
-      <View style={styles.alunoTreinos}>
-        <View style={styles.treinoInfo}>
-          <Feather name="clock" size={16} color="#00908E" />
-          <Text style={styles.treinoTexto}>Último: --/--/----</Text>
-        </View>
-
-        <View style={styles.treinoInfo}>
-          <Feather name="calendar" size={16} color="#44BF86" />
-          <Text style={styles.treinoTexto}>Próximo: --/--/----</Text>
-        </View>
       </View>
     </TouchableOpacity>
   );

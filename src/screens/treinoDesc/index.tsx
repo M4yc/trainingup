@@ -1,5 +1,5 @@
 import React from 'react';
-import { Text, View, Image, TouchableOpacity, ScrollView } from 'react-native';
+import { Text, View, Image, TouchableOpacity, ScrollView, Linking } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { MaterialIcons, FontAwesome5 } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -11,6 +11,14 @@ export default function DetalhesExercicio() {
   const navigation = useNavigation();
   const route = useRoute();
   const { exercicio } = route.params as any;
+
+  const getYouTubeId = (url: string) => {
+    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+    const match = url.match(regExp);
+    return (match && match[2].length === 11) ? match[2] : null;
+  };
+
+  const youtubeId = getYouTubeId(exercicio.imagem);
 
   return (
     <Layout>
@@ -91,12 +99,14 @@ export default function DetalhesExercicio() {
               <View style={styles.descricaoLista}>
                 <Text style={styles.descricaoItem}>{exercicio.descricao}</Text>
               </View>
-
               {exercicio.imagem ? (
-                <Image
-                  source={{ uri: exercicio.imagem }}
-                  style={styles.imagemExercicio}
-                />
+                <TouchableOpacity onPress={() => Linking.openURL(exercicio.imagem)}>
+                  <Image
+                    source={{ uri: `https://img.youtube.com/vi/${youtubeId}/hqdefault.jpg` }}
+                    style={styles.imagemExercicio}
+                  />
+                </TouchableOpacity>
+
               ) : (
                 <View style={styles.videoPlaceholder}>
                   <FontAwesome5 name="play-circle" size={64} color="#888" />

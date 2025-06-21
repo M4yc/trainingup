@@ -40,7 +40,7 @@ type NavigationProp = NativeStackNavigationProp<
 
 type Aluno = {
   id: number;
-  name: string;  
+  name: string;
 };
 
 type FichaComAluno = FichaTreino & {
@@ -59,7 +59,7 @@ export default function FichasAlunosScreen() {
   const [user, setUser] = useState<Usuario | null>(null);
   const userService = useUserService();
 
-  
+
   const formatarData = (data: string) => {
     if (!data) return '';
     try {
@@ -74,30 +74,14 @@ export default function FichasAlunosScreen() {
     }
   };
 
-  // useEffect(() => {
-  //   const loadUserData = async () => {
-  //     try {
-  //       const session = await getSession();
-  //       const userData = await userService.getCurrentUser();
-  //       setUser(userData);
-  //       console.log("Dados do usuário:", userData);
-  //     } catch (error) {
-  //       console.error("Erro ao carregar dados do perfil:", error);
-  //       Alert.alert("Erro", "Não foi possível carregar os dados do perfil");
-  //     } 
-  //   };
-
-  //   loadUserData();
-  // }, []);
-  
   const carregarFichas = async () => {
     try {
       const userData = await userService.getCurrentUser();
       setUser(userData);
-      console.log("Dados do usuário:", userData);
+      //console.log("Dados do usuário:", userData);
       const fichasPersonal = await fichaTreinoService.getFichasByPersonal(Number(userData?.id));
       const alunosPersonal = await personalService.getAlunosPersonal(Number(userData?.id));
-      
+
       // Mapear as fichas com os nomes dos alunos
       const fichasComAlunos = fichasPersonal.map(ficha => {
         const aluno = alunosPersonal.find(a => a.id === ficha.aluno_id);
@@ -106,7 +90,7 @@ export default function FichasAlunosScreen() {
           alunoNome: aluno?.name || 'Aluno não encontrado'
         };
       });
-      
+
       setFichas(fichasComAlunos);
       setAlunos(alunosPersonal);
     } catch (error) {
@@ -268,7 +252,7 @@ export default function FichasAlunosScreen() {
           style={{ flex: 1 }}
         />
 
-        <TouchableOpacity 
+        <TouchableOpacity
           style={styles.fabButton}
           onPress={() => navigation.navigate('CreateWorkoutPlan', {
             alunoId: '',
