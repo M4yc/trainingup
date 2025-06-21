@@ -1,131 +1,121 @@
 import React from 'react';
-import { Text, View, Image, StyleSheet, TouchableOpacity } from 'react-native';
+import { Text, View, Image, TouchableOpacity, ScrollView } from 'react-native';
+import { useNavigation, useRoute } from '@react-navigation/native';
+import { MaterialIcons, FontAwesome5 } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 
-export default function DetalhesExercício({ navigation, route }) {
-  const {
-    nome,
-    musculoAlvo,
-    series,
-    repeticoes,
-    peso,
-    intervalo,
-    descricao,
-    imagem,
-    numero
-  } = route.params;
+import styles from './style';
+import Layout from '@/src/components/layout';
+
+export default function DetalhesExercicio() {
+  const navigation = useNavigation();
+  const route = useRoute();
+  const { exercicio } = route.params as any;
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.header}>Detalhes do exercício</Text>
+    <Layout>
+      <View style={styles.container}>
+        <LinearGradient
+          colors={['#2c2a37', '#211d28']}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 0, y: 1 }}
+          style={styles.headerContainer}
+        >
+          <Text style={styles.header}>Detalhes do exercício</Text>
+          <Text style={styles.subtitle}>
+            Veja abaixo as informações completas
+          </Text>
+        </LinearGradient>
 
-      <View style={styles.linha} />
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{ padding: 20, paddingBottom: 40 }}
+        >
+          <View style={styles.card}>
+            <Text style={styles.cardText}>{exercicio.nome}</Text>
+            <Text style={styles.musculoAlvoText}>
+              Músculo alvo: {exercicio.musculoAlvo || '---'}
+            </Text>
 
-      <View style={styles.card}>
-        <Text style={styles.cardText}>{nome}</Text>
-        <Text style={styles.cardText}>Músculo alvo: {musculoAlvo}</Text>
-        <Text style={styles.cardText}>
-          Séries: {series} / Repetições: {repeticoes} / Peso: {peso} /
-          Intervalo: {intervalo}
-        </Text>
+            {/* Linha 1: Séries e Repetições */}
+            <View
+              style={{
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                gap: 12,
+                marginBottom: 10
+              }}
+            >
+              <View style={styles.infoRow}>
+                <FontAwesome5 name="dumbbell" size={16} color="#44BF86" />
+                <Text style={styles.infoText}>Séries: {exercicio.series}</Text>
+              </View>
+
+              <View style={styles.infoRow}>
+                <MaterialIcons name="sync-alt" size={16} color="#44BF86" />
+                <Text style={styles.infoText}>
+                  Repetições: {exercicio.repeticoes}
+                </Text>
+              </View>
+            </View>
+
+            {/* Linha 2: Peso e Intervalo */}
+            <View
+              style={{
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                gap: 12
+              }}
+            >
+              <View style={styles.infoRow}>
+                <MaterialIcons
+                  name="fitness-center"
+                  size={16}
+                  color="#44BF86"
+                />
+                <Text style={styles.infoText}>Peso: {exercicio.peso}kg</Text>
+              </View>
+
+              <View style={styles.infoRow}>
+                <MaterialIcons name="timer" size={16} color="#44BF86" />
+                <Text style={styles.infoText}>
+                  Intervalo: {exercicio.intervalo}s
+                </Text>
+              </View>
+            </View>
+
+            <View style={styles.linha} />
+
+            <View style={styles.exercicioBox}>
+              <Text style={styles.exercicioNome}>Descrição:</Text>
+              <View style={styles.descricaoLista}>
+                <Text style={styles.descricaoItem}>{exercicio.descricao}</Text>
+              </View>
+
+              {exercicio.imagem ? (
+                <Image
+                  source={{ uri: exercicio.imagem }}
+                  style={styles.imagemExercicio}
+                />
+              ) : (
+                <View style={styles.videoPlaceholder}>
+                  <FontAwesome5 name="play-circle" size={64} color="#888" />
+                  <Text style={styles.videoPlaceholderText}>
+                    Vídeo ou imagem do exercício
+                  </Text>
+                </View>
+              )}
+            </View>
+
+            <TouchableOpacity
+              style={styles.botaoVoltar}
+              onPress={() => navigation.goBack()}
+            >
+              <Text style={styles.textoVoltar}>Voltar</Text>
+            </TouchableOpacity>
+          </View>
+        </ScrollView>
       </View>
-
-      <View style={styles.linha} />
-
-      <View style={styles.exercicioBox}>
-        <Text style={styles.exercicioNome}>Exercício {numero}</Text>
-        <Text style={styles.descricaoTitulo}>Descrição:</Text>
-        <View style={styles.descricaoLista}>
-          <Text style={styles.descricaoItem}>{descricao}</Text>
-        </View>
-        <Image source={{ uri: imagem }} style={styles.imagemExercicio} />
-      </View>
-      <TouchableOpacity
-        style={styles.botaoVoltar}
-        onPress={() => navigation.goBack()}
-      >
-        <Text style={styles.textoVoltar}>Voltar</Text>
-      </TouchableOpacity>
-    </View>
+    </Layout>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#1a1a1a',
-    padding: 10
-  },
-  linha: {
-    width: '100%',
-    height: 2,
-    backgroundColor: '#00908E',
-    alignSelf: 'center'
-  },
-  header: {
-    fontSize: 20,
-    color: '#fff',
-    textAlign: 'center',
-    marginTop: 8,
-    marginBottom: 8
-  },
-  card: {
-    backgroundColor: '#1a1a1a',
-    padding: 10,
-    borderRadius: 10,
-    marginVertical: 5
-  },
-  cardText: {
-    color: '#fff',
-    fontSize: 16,
-    textAlign: 'center'
-  },
-  exercicioBox: {
-    backgroundColor: '#1a1a1a',
-    borderRadius: 10
-  },
-  exercicioNome: {
-    marginTop: 5,
-    color: '#fff',
-    fontSize: 22,
-    fontWeight: 'bold',
-    textAlign: 'center',
-    marginBottom: 10
-  },
-  descricaoTitulo: {
-    color: '#fff',
-    fontSize: 20,
-    marginBottom: 10,
-    marginLeft: 5
-  },
-  descricaoLista: {
-    marginLeft: 10,
-    marginBottom: 3
-  },
-  descricaoItem: {
-    color: '#fff',
-    fontSize: 16
-  },
-  imagemExercicio: {
-    marginTop: 150,
-    width: '100%',
-    height: 250,
-    resizeMode: 'cover',
-    borderRadius: 10,
-    marginBottom: 20,
-    padding: 10,
-    marginRight: 20
-  },
-  botaoVoltar: {
-    marginTop: 10,
-    backgroundColor: '#cccccc',
-    padding: 12,
-    borderRadius: 10,
-    alignItems: 'center',
-    marginVertical: 10
-  },
-  textoVoltar: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#333'
-  }
-});
