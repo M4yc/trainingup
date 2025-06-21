@@ -7,7 +7,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import styles from './style';
 import Layout from '@/src/components/layout';
 
-export default function DetalhesExercício() {
+export default function DetalhesExercicio() {
   const navigation = useNavigation();
   const route = useRoute();
   const { exercicio } = route.params as any;
@@ -26,69 +26,95 @@ export default function DetalhesExercício() {
             Veja abaixo as informações completas
           </Text>
         </LinearGradient>
-        <View style={styles.container}>
-          <ScrollView showsHorizontalScrollIndicator={false}>
-            <View style={styles.card}>
-              <Text style={styles.cardText}>{exercicio.nome}</Text>
-              <Text style={styles.musculoAlvoText}>
-                Musculo alvo: {exercicio.musculoAlvo || '---'}
-              </Text>
 
-              <View style={styles.infoGroup}>
-                <View style={styles.infoRow}>
-                  <FontAwesome5 name="dumbbell" size={16} color="#44BF86" />
-                  <Text style={styles.infoText}>
-                    Séries: {exercicio.series}
-                  </Text>
-                </View>
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{ padding: 20, paddingBottom: 40 }}
+        >
+          <View style={styles.card}>
+            <Text style={styles.cardText}>{exercicio.nome}</Text>
+            <Text style={styles.musculoAlvoText}>
+              Músculo alvo: {exercicio.musculoAlvo || '---'}
+            </Text>
 
-                <View style={styles.infoRow}>
-                  <MaterialIcons name="sync-alt" size={16} color="#44BF86" />
-                  <Text style={styles.infoText}>
-                    Repetições: {exercicio.repeticoes}
-                  </Text>
-                </View>
-
-                <View style={styles.infoRow}>
-                  <MaterialIcons name="timer" size={16} color="#44BF86" />
-                  <Text style={styles.infoText}>
-                    Intervalo: {exercicio.intervalo}s
-                  </Text>
-                </View>
+            {/* Linha 1: Séries e Repetições */}
+            <View
+              style={{
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                gap: 12,
+                marginBottom: 10
+              }}
+            >
+              <View style={styles.infoRow}>
+                <FontAwesome5 name="dumbbell" size={16} color="#44BF86" />
+                <Text style={styles.infoText}>Séries: {exercicio.series}</Text>
               </View>
 
-              <View style={styles.linha} />
-
-              <View style={styles.exercicioBox}>
-                <Text style={styles.exercicioNome}>Descrição:</Text>
-                <View style={styles.descricaoLista}>
-                  <Text style={styles.descricaoItem}>
-                    {exercicio.descricao}
-                  </Text>
-                </View>
-                {exercicio.imagem ? (
-                  <Image
-                    source={{ uri: exercicio.imagem }}
-                    style={styles.imagemExercicio}
-                  />
-                ) : (
-                  <View style={styles.videoPlaceholder}>
-                    <FontAwesome5 name="play-circle" size={64} color="#888" />
-                    <Text style={styles.videoPlaceholderText}>
-                      Video ou imagem do exercício
-                    </Text>
-                  </View>
-                )}
+              <View style={styles.infoRow}>
+                <MaterialIcons name="sync-alt" size={16} color="#44BF86" />
+                <Text style={styles.infoText}>
+                  Repetições: {exercicio.repeticoes}
+                </Text>
               </View>
-              <TouchableOpacity
-                style={styles.botaoVoltar}
-                onPress={() => navigation.goBack()}
-              >
-                <Text style={styles.textoVoltar}>Voltar</Text>
-              </TouchableOpacity>
             </View>
-          </ScrollView>
-        </View>
+
+            {/* Linha 2: Peso e Intervalo */}
+            <View
+              style={{
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                gap: 12
+              }}
+            >
+              <View style={styles.infoRow}>
+                <MaterialIcons
+                  name="fitness-center"
+                  size={16}
+                  color="#44BF86"
+                />
+                <Text style={styles.infoText}>Peso: {exercicio.peso}kg</Text>
+              </View>
+
+              <View style={styles.infoRow}>
+                <MaterialIcons name="timer" size={16} color="#44BF86" />
+                <Text style={styles.infoText}>
+                  Intervalo: {exercicio.intervalo}s
+                </Text>
+              </View>
+            </View>
+
+            <View style={styles.linha} />
+
+            <View style={styles.exercicioBox}>
+              <Text style={styles.exercicioNome}>Descrição:</Text>
+              <View style={styles.descricaoLista}>
+                <Text style={styles.descricaoItem}>{exercicio.descricao}</Text>
+              </View>
+
+              {exercicio.imagem ? (
+                <Image
+                  source={{ uri: exercicio.imagem }}
+                  style={styles.imagemExercicio}
+                />
+              ) : (
+                <View style={styles.videoPlaceholder}>
+                  <FontAwesome5 name="play-circle" size={64} color="#888" />
+                  <Text style={styles.videoPlaceholderText}>
+                    Vídeo ou imagem do exercício
+                  </Text>
+                </View>
+              )}
+            </View>
+
+            <TouchableOpacity
+              style={styles.botaoVoltar}
+              onPress={() => navigation.goBack()}
+            >
+              <Text style={styles.textoVoltar}>Voltar</Text>
+            </TouchableOpacity>
+          </View>
+        </ScrollView>
       </View>
     </Layout>
   );

@@ -202,7 +202,7 @@ const FichaTreinoScreen = () => {
                       <View key={idx} style={styles.group}>
                         <Text style={styles.groupTitle}>
                           {' '}
-                          Ficha {grupo.nome} - musc
+                          Ficha {grupo.nome}
                         </Text>
                         {grupo.exercicios.map((ex: any, i: number) => (
                           <Animated.View
@@ -224,7 +224,7 @@ const FichaTreinoScreen = () => {
                                     color="#ccc"
                                   />
                                   <Text style={styles.exerciseInfo}>
-                                    Séries: {ex.series || '-'}
+                                    Peso: {ex.peso || '-'}kg
                                   </Text>
                                 </View>
                                 <View style={styles.infoItem}>
@@ -234,7 +234,8 @@ const FichaTreinoScreen = () => {
                                     color="#ccc"
                                   />
                                   <Text style={styles.exerciseInfo}>
-                                    Reps: {ex.repeticoes || '-'}
+                                    Séries/Reps: {ex.series || '-'}x
+                                    {ex.repeticoes || '-'}
                                   </Text>
                                 </View>
                                 <View style={styles.infoItem}>
